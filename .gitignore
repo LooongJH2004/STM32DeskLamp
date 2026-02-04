@@ -1,0 +1,35 @@
+# 忽略 Keil 编译产生的中间文件和输出文件
+**/Listings/
+**/Objects/
+**/DebugConfig/
+**/*.uvguix.*
+**/*.uvoptx
+**/*.dep
+**/*.bak
+**/*.map
+**/*.o
+**/*.d
+**/*.crf
+**/*.iex
+**/*.htm
+**/*.sct
+**/*.lnp
+**/*.axf
+**/*.elf
+
+# 忽略 J-Link / ST-Link 生成的配置
+JLinkLog.txt
+*.ini
+
+# 忽略 VS Code 配置 (可选)
+.vscode/
+
+# -------------------------------------------------
+# 关于你的需求 "只监控 Project" 的特别说明：
+# -------------------------------------------------
+# 你的 Library (标准库) 和 Start (启动文件) 也是代码运行必须的。
+# 如果你只上传 Project，别人下载后是无法编译的。
+# 所以建议保留 Library 和 Start。
+# 但如果你非常确定只要 Project，可以取消下面这行的注释：
+ /stm32端智能台灯/Library/
+ /stm32端智能台灯/Start/
