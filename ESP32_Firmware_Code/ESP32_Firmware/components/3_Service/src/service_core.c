@@ -4,6 +4,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "agents/agent_baidu_asr.h" // 引入 ASR 代理
+#include "agents/agent_lampmind.h" // [新增] 引入 LampMind 代理
 
 static const char *TAG = "Svc_Core";
 static SystemState_t s_current_state = SYS_STATE_IDLE;
@@ -43,11 +44,10 @@ static void _handle_state_listening(SystemEvent_t *evt) {
                 s_current_state = SYS_STATE_PROCESSING;
                 EventBus_Send(EVT_SYS_STATE_CHANGE, (void*)SYS_STATE_PROCESSING, 0);
                 
-                // 模拟 LLM 处理 (后续替换为真实调用)
-                vTaskDelay(pdMS_TO_TICKS(1000));
-                EventBus_Send(EVT_LLM_RESULT, NULL, 0);
+                // [修改] 启动 LampMind 请求任务
+                // 注意：evt->data 的内存将由 Agent_LampMind_Chat_Task 负责释放，这里不再 free
+                xTaskCreate(Agent_LampMind_Chat_Task, "LampMind_Task", 8192, evt->data, 5, NULL);
                 
-                free(evt->data); // 释放 ASR 分配的内存
             } else {
                 // 识别为空 -> 回到 IDLE
                 ESP_LOGW(TAG, "[LISTENING] ASR Empty -> Back to IDLE");
@@ -72,10 +72,19 @@ static void _handle_state_processing(SystemEvent_t *evt) {
     switch (evt->type) {
         case EVT_LLM_RESULT:
             ESP_LOGI(TAG, "[PROCESSING] LLM Result -> Switch to SPEAKING");
+            
+            // [新增] 打印 LLM 回复的文本，并释放内存
+            if (evt->data) {
+                ESP_LOGI(TAG, ">>> LampMind Reply: %s", (char*)evt->data);
+                free(evt->data); // 释放由 Agent_LampMind 分配的 reply_text 内存
+            } else {
+                ESP_LOGW(TAG, ">>> LampMind Reply: (Empty/Error)");
+            }
+
             s_current_state = SYS_STATE_SPEAKING;
             EventBus_Send(EVT_SYS_STATE_CHANGE, (void*)SYS_STATE_SPEAKING, 0);
             
-            // 模拟 TTS 播放完成
+            // 模拟 TTS 播放完成 (后续替换为真实 TTS)
             vTaskDelay(pdMS_TO_TICKS(2000));
             EventBus_Send(EVT_TTS_PLAY_FINISH, NULL, 0);
             break;
@@ -84,7 +93,6 @@ static void _handle_state_processing(SystemEvent_t *evt) {
             break;
     }
 }
-
 static void _handle_state_speaking(SystemEvent_t *evt) {
     switch (evt->type) {
         case EVT_TTS_PLAY_FINISH:

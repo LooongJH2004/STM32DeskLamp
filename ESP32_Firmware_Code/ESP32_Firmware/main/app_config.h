@@ -41,4 +41,9 @@
     #define APP_LOGE(tag, format, ...) do {} while(0)
 #endif
 
+// --- LampMind Server Settings ---
+// 请将 IP 替换为你运行后端服务的电脑的局域网 IP
+#define LAMPMIND_SERVER_URL     "http://192.168.10.8:8000/chat" 
+#define LAMPMIND_DEVICE_ID      "esp32_001"
+
 #endif // APP_CONFIG_H
