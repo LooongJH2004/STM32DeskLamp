@@ -8,6 +8,7 @@
 #include "app_config.h"
 #include "service_core.h"
 #include "event_bus.h"
+#include "data_center.h"
 
 // 引入按键库
 #include "KeyManager.h"
@@ -61,6 +62,7 @@ void app_main(void) {
     ESP_LOGI(TAG, "System Start...");
 
     // 1. 基础初始化
+    DataCenter_Init(); // [新增] 初始化数据中心
     Mgr_Wifi_Init();
     
     Audio_Config_t audio_cfg = {
@@ -94,7 +96,26 @@ void app_main(void) {
     Mgr_Wifi_Connect(MY_WIFI_SSID, MY_WIFI_PASS);
 
     // 5. 主循环空转 (任务都在后台运行)
+    int loop_count = 0;
     while(1) {
+        // 每 5 秒打印一次数据中心状态
+        if (loop_count % 5 == 0) {
+            DataCenter_PrintStatus();
+        }
+
+        // 模拟第 10 秒时，LLM 下发了灯光控制指令
+        if (loop_count == 10) {
+            ESP_LOGI(TAG, "--- Simulating LLM Command ---");
+            DC_LightingData_t new_light = {
+                .power = true,
+                .brightness = 80,
+                .color_temp = 20 // 偏暖
+            };
+            // 调用 Set，内部会自动触发 EVT_DATA_LIGHT_CHANGED 事件
+            DataCenter_Set_Lighting(&new_light); 
+        }
+
+        loop_count++;
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }

@@ -24,9 +24,6 @@
 // 接线方式: GPIO 21 <--> 按钮 <--> GND
 #define BOARD_BUTTON_PIN        21 
 
-#endif // APP_CONFIG_H
-
-
 /**
  * @brief 业务层调试日志开关
  * @note  1: 开启打印; 0: 关闭打印 (节省 CPU 和 串口带宽)

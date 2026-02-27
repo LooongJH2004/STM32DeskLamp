@@ -39,7 +39,13 @@ typedef enum {
 
     // 5. 设备控制 (Output)
     EVT_LIGHT_SET_COLOR = 0x500,  // 设置灯光颜色 (参数: RGB/CCT)
-    EVT_LIGHT_SET_BRIGHTNESS      // 设置亮度 (参数: 0-100)
+    EVT_LIGHT_SET_BRIGHTNESS,     // 设置亮度 (参数: 0-100)
+
+    // 6. 数据中心变更事件 (Data Center Updates) [新增]
+    EVT_DATA_LIGHT_CHANGED = 0x600, // 灯光数据已更新
+    EVT_DATA_ENV_CHANGED,           // 环境数据已更新 (温湿度/天气)
+    EVT_DATA_TIMER_CHANGED,         // 定时器数据已更新
+    EVT_DATA_SYS_CHANGED            // 系统状态已更新
 } EventType_t;
 
 // --- 事件结构体 ---
