@@ -6,50 +6,61 @@
 #include "manager/mgr_wifi.h"
 #include "dev_audio.h"
 #include "app_config.h"
-#include "agents/agent_baidu_asr.h" // 引入新组件
+#include "service_core.h"
+#include "event_bus.h"
+
+// 引入按键库
+#include "KeyManager.h"
+#include "Key.h"
 
 static const char *TAG = "MAIN";
 
 #define MY_WIFI_SSID      "CMCC-2079"
 #define MY_WIFI_PASS      "88888888"
 
-void asr_test_task(void *pvParameters) {
-    // 1. 等待网络
-    while (Mgr_Wifi_GetStatus() != WIFI_STATUS_CONNECTED) {
-        vTaskDelay(pdMS_TO_TICKS(500));
-    }
-    ESP_LOGI(TAG, "WiFi Connected. Init ASR...");
-
-    // 2. 初始化 ASR (获取 Token)
-    Agent_ASR_Init();
-
+// --- 按键扫描任务 ---
+// 负责周期性调用 KeyManager_Tick 并将事件转发到 EventBus
+void Key_Task(void *pvParameters) {
+    ESP_LOGI(TAG, "Key Task Started");
+    
+    KeyEvent_t key_evt;
+    
     while (1) {
-        ESP_LOGI(TAG, ">>> Press ENTER to start recording (Simulated by 5s delay) <<<");
-        vTaskDelay(pdMS_TO_TICKS(3000)); // 倒计时
-
-        ESP_LOGI(TAG, ">>> Recording 5 seconds... Speak Now! <<<");
+        // 1. 驱动核心逻辑 (建议 10ms 周期)
+        KeyManager_Tick();
         
-        // 3. 启动识别 (设置最大 60秒，但我们会在 5秒后手动停止)
-        // 注意：Agent_ASR_Run_Session 是阻塞的，直到 Agent_ASR_Stop 被调用或超时
-        // 为了测试，我们这里直接让它录满 5 秒 (通过修改 Run_Session 内部逻辑或传入 5000)
-        // 这里我们传入 5000ms 进行测试
-        char *text = Agent_ASR_Run_Session(5000);
-
-        if (text) {
-            ESP_LOGW(TAG, "### ASR Result: [%s] ###", text);
-            free(text);
-        } else {
-            ESP_LOGE(TAG, "ASR Failed.");
+        // 2. 检查是否有事件产生
+        if (KeyManager_GetEvent(&key_evt)) {
+            // 3. 转发到系统 EventBus
+            switch (key_evt.Type) {
+                case KEY_EVT_CLICK:
+                    ESP_LOGI(TAG, "Physical Key Click!");
+                    EventBus_Send(EVT_KEY_CLICK, NULL, 0);
+                    break;
+                    
+                case KEY_EVT_DOUBLE_CLICK:
+                    ESP_LOGI(TAG, "Physical Key Double Click!");
+                    EventBus_Send(EVT_KEY_DOUBLE_CLICK, NULL, 0);
+                    break;
+                    
+                case KEY_EVT_HOLD_START:
+                    ESP_LOGI(TAG, "Physical Key Hold Start");
+                    EventBus_Send(EVT_KEY_LONG_PRESS, NULL, 0);
+                    break;
+                    
+                default:
+                    break;
+            }
         }
-
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        
+        vTaskDelay(pdMS_TO_TICKS(10)); // 10ms 轮询间隔
     }
 }
 
 void app_main(void) {
     ESP_LOGI(TAG, "System Start...");
 
-    // 初始化
+    // 1. 基础初始化
     Mgr_Wifi_Init();
     
     Audio_Config_t audio_cfg = {
@@ -60,8 +71,30 @@ void app_main(void) {
     };
     Dev_Audio_Init(&audio_cfg);
 
+    // 2. 按键初始化
+    KeyManager_Init();
+    static Key_t s_UserKey; // 改个名字，叫 UserKey 更合适
+
+    // 参数说明: 
+    // &s_UserKey: 按键对象
+    // 1: ID (用于区分不同按键)
+    // BOARD_BUTTON_PIN: 引脚号 (21)
+    // 0: 有效电平 (0表示按下是低电平，驱动会自动开启内部上拉电阻)
+    Key_Init(&s_UserKey, 1, BOARD_BUTTON_PIN, 0); 
+    
+    KeyManager_Register(&s_UserKey);
+    
+    // 创建按键扫描任务 (保持不变)
+    xTaskCreate(Key_Task, "Key_Task", 2048, NULL, 5, NULL);
+
+    // 3. 启动神经中枢
+    Service_Core_Init();
+
+    // 4. 启动网络连接
     Mgr_Wifi_Connect(MY_WIFI_SSID, MY_WIFI_PASS);
 
-    // 创建 ASR 测试任务
-    xTaskCreate(asr_test_task, "asr_test", 8192, NULL, 5, NULL);
+    // 5. 主循环空转 (任务都在后台运行)
+    while(1) {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 }

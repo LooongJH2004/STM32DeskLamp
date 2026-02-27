@@ -10,6 +10,7 @@
 #include "nvs_flash.h"
 #include "esp_sntp.h"
 #include "esp_netif.h"
+#include "event_bus.h" // [NEW] 引入事件总线
 
 static const char *TAG = "Mgr_Wifi";
 
@@ -25,6 +26,9 @@ static bool s_time_synced = false;
 static void time_sync_notification_cb(struct timeval *tv) {
     ESP_LOGI(TAG, "Time Synced Notification!");
     s_time_synced = true;
+    
+    // 发送事件通知系统
+    EventBus_Send(EVT_TIME_SYNCED, NULL, 0);
     
     // 打印当前时间
     time_t now;
@@ -56,13 +60,13 @@ static void event_handler(void* arg, esp_event_base_t event_base,
     
     // 1. Wi-Fi 启动 -> 开始连接
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
-        // 注意：这里不直接 connect，而是等待 Mgr_Wifi_Connect 被调用
         s_wifi_status = WIFI_STATUS_IDLE;
     } 
     // 2. 连接断开 -> 重连
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
         s_wifi_status = WIFI_STATUS_DISCONNECTED;
         s_time_synced = false; 
+        EventBus_Send(EVT_NET_DISCONNECTED, NULL, 0); // 发送断开事件
         
         if (s_retry_num < MAX_RETRY_COUNT) {
             esp_wifi_connect();
@@ -71,6 +75,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
         } else {
             ESP_LOGE(TAG, "Connect to the AP failed. Please check SSID/PWD.");
             s_wifi_status = WIFI_STATUS_ERROR;
+            EventBus_Send(EVT_SYS_ERROR, (void*)WIFI_STATUS_ERROR, 0); // 发送错误事件
         }
     } 
     // 3. 获取 IP -> 连接成功
@@ -79,6 +84,9 @@ static void event_handler(void* arg, esp_event_base_t event_base,
         ESP_LOGI(TAG, "Got IP: " IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         s_wifi_status = WIFI_STATUS_CONNECTED;
+        
+        // 发送连接成功事件
+        EventBus_Send(EVT_NET_CONNECTED, NULL, 0);
         
         // 关键：拿到 IP 后，立即启动 SNTP
         _init_sntp();

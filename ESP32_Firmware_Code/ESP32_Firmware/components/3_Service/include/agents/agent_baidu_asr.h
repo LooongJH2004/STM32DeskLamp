@@ -16,11 +16,15 @@
 void Agent_ASR_Init(void);
 
 /**
- * @brief 开始一次语音识别会话
- * @param max_duration_ms 最大录音时长 (ms)，例如 60000
- * @return char* 识别到的文字 (需要调用者 free)，失败返回 NULL
+ * @brief 开始一次语音识别会话 (作为独立任务运行)
+ * 
+ * @note 此函数是阻塞的，建议通过 xTaskCreate 调用。
+ *       识别结果将通过 EventBus 发送 EVT_ASR_RESULT 事件。
+ *       任务执行完毕后会自动删除自身。
+ * 
+ * @param pvParameters 传入最大录音时长 (int)，单位 ms。例如 (void*)5000
  */
-char* Agent_ASR_Run_Session(int max_duration_ms);
+void Agent_ASR_Run_Session(void *pvParameters);
 
 /**
  * @brief 强制停止当前的录音会话 (用于按键松开或 VAD 截断)
