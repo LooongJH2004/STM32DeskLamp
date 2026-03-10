@@ -161,3 +161,40 @@ sequenceDiagram
 *   [03_STM32_Design.md](docs/03_STM32_Design.md): STM32 固件逻辑与设计反思。
 *   [04_Hardware_Wiring.md](docs/04_Hardware_Wiring.md): 硬件引脚分配与接线图。
 *   [05_Issues_Roadmap.md](docs/05_Issues_Roadmap.md): 问题追踪与后续开发路线图。
+
+
+---
+# MQTT部分
+
+```mermaid
+
+graph TD
+    subgraph "你的电脑 (PC)"
+        direction TB
+        Python[Python GUI 客户端]
+        Mosquitto[Eclipse Mosquitto - Broker]
+    end
+
+    subgraph "智能台灯 (Device)"
+        ESP32[ESP32 主控]
+        STM32[STM32 协处理]
+    end
+
+    %% 通信链路
+    Python -- "1. 发布 (Pub) JSON" --> Mosquitto
+    Mosquitto -- "2. 转发 (Push)" --> ESP32
+    ESP32 -- "3. UART 指令" --> STM32
+    
+    STM32 -- "4. 旋钮转动" --> ESP32
+    ESP32 -- "5. 发布 (Pub) 状态" --> Mosquitto
+    Mosquitto -- "6. 转发 (Push)" --> Python
+
+    %% 协议标注
+    linkStyle 0 stroke:#f66,stroke-width:2px
+    linkStyle 1 stroke:#f66,stroke-width:2px
+    linkStyle 2 stroke:#66f,stroke-width:2px
+    linkStyle 3 stroke:#66f,stroke-width:2px
+    linkStyle 4 stroke:#f66,stroke-width:2px
+    linkStyle 5 stroke:#f66,stroke-width:2px
+
+```
