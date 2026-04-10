@@ -12,6 +12,14 @@ static lv_obj_t * s_sw_power;
 static lv_obj_t * s_btn_test;
 
 static uint32_t s_last_bri_tick = 0;
+
+// 延迟重绘回调函数
+static void delayed_refresh_cb(lv_timer_t * timer) {
+    lv_obj_invalidate(lv_scr_act()); // 触发全屏重绘
+    lv_timer_del(timer);             // 执行一次后销毁自己 (One-shot)
+}
+
+
 static void slider_bri_event_cb(lv_event_t * e) {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * slider = lv_event_get_target(e);
@@ -30,7 +38,8 @@ static void slider_bri_event_cb(lv_event_t * e) {
     } else if (code == LV_EVENT_RELEASED) {
         // 【松手自愈】手指离开屏幕时，强制全屏重绘一次。
         // 这样即使刚才拖动时面包板产生了轻微花屏，也会在松手瞬间被完美洗掉！
-        lv_obj_invalidate(lv_scr_act());
+        // 延迟 50ms 后再执行全屏重绘，等待物理总线电平沉降
+        lv_timer_create(delayed_refresh_cb, 50, NULL);
     }
 }
 
@@ -49,7 +58,8 @@ static void slider_cct_event_cb(lv_event_t * e) {
             s_last_cct_tick = lv_tick_get();
         }
     } else if (code == LV_EVENT_RELEASED) {
-        lv_obj_invalidate(lv_scr_act()); // 松手自愈
+        // 延迟 50ms 后再执行全屏重绘，等待物理总线电平沉降
+        lv_timer_create(delayed_refresh_cb, 50, NULL);
     }
 }
 
