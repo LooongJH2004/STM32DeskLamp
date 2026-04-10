@@ -5,6 +5,7 @@
 #define AUDIO_I2S_BCK_PIN       42
 #define AUDIO_I2S_WS_PIN        41
 #define AUDIO_I2S_DATA_IN_PIN   40
+#define AUDIO_I2S_DATA_OUT_PIN  39  // [新增] 功放 DIN 引脚
 #define AUDIO_SAMPLE_RATE       16000
 #define AUDIO_BIT_WIDTH         32
 

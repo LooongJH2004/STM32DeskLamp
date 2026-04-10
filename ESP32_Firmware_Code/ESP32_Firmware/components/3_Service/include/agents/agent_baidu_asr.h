@@ -30,3 +30,8 @@ void Agent_ASR_Run_Session(void *pvParameters);
  * @brief 强制停止当前的录音会话 (用于按键松开或 VAD 截断)
  */
 void Agent_ASR_Stop(void);
+
+/**
+ * @brief 获取百度的 Access Token (供 TTS 模块复用)
+ */
+const char* Agent_ASR_Get_Token(void);

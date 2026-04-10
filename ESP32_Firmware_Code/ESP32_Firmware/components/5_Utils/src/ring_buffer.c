@@ -63,3 +63,7 @@ size_t RingBuffer_Read(RingBuffer_t *rb, uint8_t *data, size_t len) {
     xSemaphoreGive(rb->mutex);
     return len;
 }
+
+size_t RingBuffer_GetCount(const RingBuffer_t *rb) {
+    return rb ? rb->count : 0;
+}

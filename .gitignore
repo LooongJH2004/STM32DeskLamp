@@ -115,3 +115,9 @@ ESP32_Firmware_Code/ESP32_Firmware/temporaryMarkdown.md
 converted-document.pdf
 Python_MQTT_Lamp_Control_Panel/build_exe.bat
 espressif.esp-idf-extension-2.0.1.vsix
+test_baidu_tts.wav
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/UseGit2VersionControl.iml
+.idea/vcs.xml

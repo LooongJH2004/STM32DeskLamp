@@ -20,4 +20,4 @@ size_t RingBuffer_Write(RingBuffer_t *rb, const uint8_t *data, size_t len);
 // 读取数据
 size_t RingBuffer_Read(RingBuffer_t *rb, uint8_t *data, size_t len);
 // 获取当前缓冲区中存在的，但未被读取的数据量
-size_t RingBuffer_GetCount(RingBuffer_t *rb);
+size_t RingBuffer_GetCount(const RingBuffer_t *rb);

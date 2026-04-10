@@ -284,3 +284,14 @@ void Agent_ASR_Run_Session(void *pvParameters) {
     heap_caps_free(audio_buffer);
     vTaskDelete(NULL);
 }
+
+
+// ============================================================================
+// 暴露 Token 给其他模块 (如 TTS)
+// ============================================================================
+const char* Agent_ASR_Get_Token(void) {
+    if (!s_access_token) {
+        _get_token(); // 如果还没有 Token，就去获取一次
+    }
+    return s_access_token;
+}
