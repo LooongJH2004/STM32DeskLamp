@@ -28,29 +28,29 @@ static const char *TAG = "UI_PORT_DISP";
 #define LCD_H_RES 320
 #define LCD_V_RES 240
 
-// 1/5 屏幕大小的双缓冲
-#define DISP_BUF_SIZE (LCD_H_RES * LCD_V_RES / 5)
+// 单缓冲，1/4 屏幕大小
+#define DISP_BUF_SIZE (LCD_H_RES * LCD_V_RES / 4)
 
 static esp_lcd_panel_io_handle_t io_handle = NULL; 
 static esp_lcd_panel_handle_t panel_handle = NULL;
 
 static lv_disp_draw_buf_t disp_buf;
-static lv_color_t *buf1 = NULL;
-static lv_color_t *buf2 = NULL; 
+static lv_color_t *buf1 = NULL; 
 static lv_disp_drv_t disp_drv;
 
+// 全局隔离标志位
 volatile bool g_lcd_is_flushing = false;
 
 static bool notify_lvgl_flush_ready(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx) {
     lv_disp_drv_t *disp_driver = (lv_disp_drv_t *)user_ctx;
-    g_lcd_is_flushing = false; 
+    g_lcd_is_flushing = false; // 释放总线
     lv_disp_flush_ready(disp_driver);
     return false; 
 }
 
 static void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map) {
     esp_lcd_panel_handle_t panel = (esp_lcd_panel_handle_t) drv->user_data;
-    g_lcd_is_flushing = true;  
+    g_lcd_is_flushing = true;  // 锁定总线
     esp_lcd_panel_draw_bitmap(panel, area->x1, area->y1, area->x2 + 1, area->y2 + 1, color_map);
 }
 
@@ -72,8 +72,8 @@ void UI_Port_Disp_Init(void) {
 
     esp_lcd_panel_io_i80_config_t io_config = {
         .cs_gpio_num = LCD_CS,
-        .pclk_hz = 5 * 1000 * 1000, // 【关键修改】提速到 15MHz，缩短 DMA 占用时间
-        .trans_queue_depth = 2,      // 【关键修改】匹配双缓冲深度
+        .pclk_hz = 5 * 1000 * 1000, // 5MHz 安全频率
+        .trans_queue_depth = 1,     // 队列深度 1，防止积压
         .dc_levels = {
             .dc_idle_level = 0, .dc_cmd_level = 0,
             .dc_dummy_level = 0, .dc_data_level = 1,
@@ -110,10 +110,9 @@ void UI_Port_Disp_Init(void) {
     lv_init();
 
     buf1 = heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
-    buf2 = heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
-    assert(buf1 && buf2);
+    assert(buf1);
 
-    lv_disp_draw_buf_init(&disp_buf, buf1, buf2, DISP_BUF_SIZE);
+    lv_disp_draw_buf_init(&disp_buf, buf1, NULL, DISP_BUF_SIZE);
 
     lv_disp_drv_init(&disp_drv);
     disp_drv.full_refresh = 0; 

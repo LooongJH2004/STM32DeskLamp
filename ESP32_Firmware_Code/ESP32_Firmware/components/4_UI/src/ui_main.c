@@ -9,40 +9,47 @@ static lv_obj_t * s_slider_bri;
 static lv_obj_t * s_slider_cct;
 static lv_obj_t * s_label_env;
 static lv_obj_t * s_sw_power;
-static lv_obj_t * s_btn_test; // 自动测试按钮
-
-// ============================================================
-// 1. UI 交互事件回调 (UI -> DataCenter)
-// ============================================================
+static lv_obj_t * s_btn_test;
 
 static uint32_t s_last_bri_tick = 0;
 static void slider_bri_event_cb(lv_event_t * e) {
+    lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * slider = lv_event_get_target(e);
-    int bri = lv_slider_get_value(slider);
     
-    // 【跟手优化】软件限流：每 50ms 最多下发一次数据。
-    // 这样滑块在屏幕上是 60FPS 实时滑动的，但底层通信被限制在 20Hz，杜绝事件风暴。
-    if (lv_tick_elaps(s_last_bri_tick) > 50) {
-        DC_LightingData_t light;
-        DataCenter_Get_Lighting(&light);
-        light.brightness = bri;
-        if (bri > 0) light.power = true; 
-        DataCenter_Set_Lighting(&light);
-        s_last_bri_tick = lv_tick_get();
+    if (code == LV_EVENT_VALUE_CHANGED) {
+        // 拖动时：50ms 限流，保证丝滑且不卡死总线
+        if (lv_tick_elaps(s_last_bri_tick) > 50) {
+            int bri = lv_slider_get_value(slider);
+            DC_LightingData_t light;
+            DataCenter_Get_Lighting(&light);
+            light.brightness = bri;
+            if (bri > 0) light.power = true; 
+            DataCenter_Set_Lighting(&light);
+            s_last_bri_tick = lv_tick_get();
+        }
+    } else if (code == LV_EVENT_RELEASED) {
+        // 【松手自愈】手指离开屏幕时，强制全屏重绘一次。
+        // 这样即使刚才拖动时面包板产生了轻微花屏，也会在松手瞬间被完美洗掉！
+        lv_obj_invalidate(lv_scr_act());
     }
 }
 
 static uint32_t s_last_cct_tick = 0;
 static void slider_cct_event_cb(lv_event_t * e) {
+    lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * slider = lv_event_get_target(e);
-    int cct = lv_slider_get_value(slider);
     
-    if (lv_tick_elaps(s_last_cct_tick) > 50) {
-        DC_LightingData_t light;
-        DataCenter_Get_Lighting(&light);
-        light.color_temp = cct;
-        DataCenter_Set_Lighting(&light);
-        s_last_cct_tick = lv_tick_get();
+    if (code == LV_EVENT_VALUE_CHANGED) {
+        if (lv_tick_elaps(s_last_cct_tick) > 50) {
+            int cct = lv_slider_get_value(slider);
+            DC_LightingData_t light;
+            DataCenter_Get_Lighting(&light);
+            light.color_temp = cct;
+            DataCenter_Set_Lighting(&light);
+            s_last_cct_tick = lv_tick_get();
+        }
+    } else if (code == LV_EVENT_RELEASED) {
+        lv_obj_invalidate(lv_scr_act()); // 松手自愈
     }
 }
 
@@ -56,9 +63,6 @@ static void sw_power_event_cb(lv_event_t * e) {
     DataCenter_Set_Lighting(&light);
 }
 
-// ============================================================
-// 自动测试动画 (用于隔离排查硬件撕裂)
-// ============================================================
 static void auto_anim_cb(void * var, int32_t v) {
     lv_slider_set_value((lv_obj_t *)var, v, LV_ANIM_ON);
 }
@@ -71,23 +75,19 @@ static void btn_test_event_cb(lv_event_t * e) {
         lv_anim_init(&a);
         lv_anim_set_var(&a, s_slider_bri);
         lv_anim_set_values(&a, 0, 100);
-        lv_anim_set_time(&a, 1500);
-        lv_anim_set_playback_time(&a, 1500);
+        lv_anim_set_time(&a, 3000);
+        lv_anim_set_playback_time(&a, 3000);
         lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
         lv_anim_set_exec_cb(&a, auto_anim_cb);
         lv_anim_start(&a);
         lv_obj_set_style_bg_color(s_btn_test, lv_palette_main(LV_PALETTE_RED), 0);
-        ESP_LOGI(TAG, "Auto Test Started");
     } else {
         lv_anim_del(s_slider_bri, auto_anim_cb);
         lv_obj_set_style_bg_color(s_btn_test, lv_palette_main(LV_PALETTE_BLUE), 0);
-        ESP_LOGI(TAG, "Auto Test Stopped");
+        lv_obj_invalidate(lv_scr_act()); // 停止时自愈
     }
 }
 
-// ============================================================
-// 2. 数据同步定时器 (DataCenter -> UI)
-// ============================================================
 static void ui_sync_timer_cb(lv_timer_t * timer) {
     DC_EnvData_t env;
     DataCenter_Get_Env(&env);
@@ -111,9 +111,6 @@ static void ui_sync_timer_cb(lv_timer_t * timer) {
     }
 }
 
-// ============================================================
-// 3. 界面构建
-// ============================================================
 void UI_Main_Init(void) {
     lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x1E1E1E), LV_PART_MAIN);
 
@@ -122,7 +119,6 @@ void UI_Main_Init(void) {
     lv_obj_set_style_text_color(label_title, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_align(label_title, LV_ALIGN_TOP_LEFT, 20, 20);
 
-    // 【新增】自动测试按钮
     s_btn_test = lv_btn_create(lv_scr_act());
     lv_obj_align(s_btn_test, LV_ALIGN_TOP_RIGHT, -80, 10);
     lv_obj_set_style_bg_color(s_btn_test, lv_palette_main(LV_PALETTE_BLUE), 0);
@@ -144,8 +140,8 @@ void UI_Main_Init(void) {
     lv_obj_align(s_slider_bri, LV_ALIGN_TOP_MID, 0, 100);
     lv_slider_set_range(s_slider_bri, 0, 100);
     lv_obj_set_style_bg_color(s_slider_bri, lv_palette_main(LV_PALETTE_AMBER), LV_PART_INDICATOR);
-    // 【恢复】改回 VALUE_CHANGED，配合上面的 50ms 限流器
-    lv_obj_add_event_cb(s_slider_bri, slider_bri_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    // 【修改】监听所有事件，在回调中区分拖动和松手
+    lv_obj_add_event_cb(s_slider_bri, slider_bri_event_cb, LV_EVENT_ALL, NULL);
 
     lv_obj_t * label_cct = lv_label_create(lv_scr_act());
     lv_label_set_text(label_cct, "Color Temp (Warm -> Cold)");
@@ -157,8 +153,8 @@ void UI_Main_Init(void) {
     lv_obj_align(s_slider_cct, LV_ALIGN_TOP_MID, 0, 170);
     lv_slider_set_range(s_slider_cct, 0, 100);
     lv_obj_set_style_bg_color(s_slider_cct, lv_palette_main(LV_PALETTE_BLUE), LV_PART_INDICATOR);
-    // 【恢复】改回 VALUE_CHANGED
-    lv_obj_add_event_cb(s_slider_cct, slider_cct_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    // 【修改】监听所有事件
+    lv_obj_add_event_cb(s_slider_cct, slider_cct_event_cb, LV_EVENT_ALL, NULL);
 
     s_label_env = lv_label_create(lv_scr_act());
     lv_label_set_text(s_label_env, "Temp: -- C   Hum: -- %   Lux: --");
