@@ -31,26 +31,30 @@ static char *url_encode(const char *str) {
     return encoded;
 }
 
+static bool s_is_audio_response = false;
+
 static esp_err_t _tts_http_event_handler(esp_http_client_event_t *evt) {
     switch (evt->event_id) {
         case HTTP_EVENT_ON_HEADER:
-            // [诊断] 打印返回的 Header，看是不是 audio
-            ESP_LOGI(TAG, "Header: %s = %s", evt->header_key, evt->header_value);
+            // 【核心修复】严格检查 Content-Type
+            if (strcasecmp(evt->header_key, "Content-Type") == 0) {
+                if (strstr(evt->header_value, "audio") != NULL) {
+                    s_is_audio_response = true;
+                } else {
+                    s_is_audio_response = false;
+                    ESP_LOGE(TAG, "API Error! Content-Type is not audio: %s", evt->header_value);
+                }
+            }
             break;
             
         case HTTP_EVENT_ON_DATA: {
             int status = esp_http_client_get_status_code(evt->client);
-            if (status == 200) {
-                // [诊断] 检查前几个字节是不是 JSON 的 '{'
-                if (evt->data_len > 0 && ((char*)evt->data)[0] == '{') {
-                    ESP_LOGE(TAG, "API ERROR RETURNED: %.*s", evt->data_len, (char*)evt->data);
-                    // 如果是错误信息，绝对不能塞进音频缓冲区！
-                    return ESP_OK; 
-                }
-                // 正常音频数据，塞入缓冲区
+            if (status == 200 && s_is_audio_response) {
+                // 只有确认为 audio 格式，才喂给播放器
                 Svc_Audio_Feed_Data((const uint8_t *)evt->data, evt->data_len);
-            } else {
-                ESP_LOGE(TAG, "HTTP Error Status: %d", status);
+            } else if (!s_is_audio_response) {
+                // 打印出百度的报错信息，方便调试
+                ESP_LOGE(TAG, "Baidu API Error Msg: %.*s", evt->data_len, (char*)evt->data);
             }
             break;
         }

@@ -1,8 +1,8 @@
 # main/CMakeLists.txt
 
 idf_component_register(
-    SRCS "main.c"
+    SRCS "main.c" "app_config.h"
     INCLUDE_DIRS "."
-    # REQUIRES 2_Device 5_Utils # 通常不需要写，系统会自动链接，如果报错再加
+    # 显式声明依赖 4_UI 和 lvgl
+    REQUIRES 2_Device 3_Service 4_UI lvgl 
 )
-

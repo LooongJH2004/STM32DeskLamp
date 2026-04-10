@@ -32,7 +32,7 @@ static void audio_play_task(void *arg) {
         size_t available = RingBuffer_GetCount(s_audio_rb);
         
         if (is_buffering) {
-            if (available >= 8192) { // 提高预缓冲阈值到 4KB
+            if (available >= 12288) { // 提高预缓冲阈值到 4KB
                 is_buffering = false;
                 ESP_LOGI(TAG, "Buffering done, start playing.");
             } else {

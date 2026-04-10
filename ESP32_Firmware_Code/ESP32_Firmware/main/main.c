@@ -1,5 +1,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
 
@@ -14,39 +15,83 @@
 #include "KeyManager.h"
 #include "Key.h"
 #include "svc_audio.h" 
-#include "agents/agent_baidu_tts.h" // [新增] 引入 TTS 代理
+#include "agents/agent_baidu_tts.h"
+
+// --- 新增 UI 相关头文件 ---
+#include "lvgl.h"
+#include "ui_port.h"
 
 static const char *TAG = "MAIN";
 
 #define MY_WIFI_SSID      "CMCC-2079"
 #define MY_WIFI_PASS      "88888888"
 
+// LVGL 全局互斥锁 (LVGL 的 API 不是线程安全的，跨任务调用必须加锁)
+SemaphoreHandle_t g_lvgl_mux;
+
 // ============================================================================
-// [新增] 开机播报测试任务 (运行在 Core 0)
+// [新增] LVGL 渲染与心跳任务 (运行在 Core 1)
+// ============================================================================
+static void gui_task(void *arg) {
+    ESP_LOGI(TAG, "GUI Task Started on Core 1");
+
+    // 1. 创建 LVGL 互斥锁
+    g_lvgl_mux = xSemaphoreCreateMutex();
+
+    // 2. 初始化屏幕底层与 LVGL
+    UI_Port_Disp_Init();
+
+    // 3. 绘制一个测试界面 (加锁)
+    xSemaphoreTake(g_lvgl_mux, portMAX_DELAY);
+    
+    // 设置屏幕背景色为深灰色
+    lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x333333), LV_PART_MAIN);
+
+    // 创建一个按钮
+    lv_obj_t * btn = lv_btn_create(lv_scr_act());
+    lv_obj_align(btn, LV_ALIGN_CENTER, 0, 0); // 居中对齐
+    lv_obj_set_size(btn, 200, 80);
+    lv_obj_set_style_bg_color(btn, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN); // 红色按钮
+
+    // 在按钮上创建标签
+    lv_obj_t * label = lv_label_create(btn);
+    lv_label_set_text(label, "Hello LVGL!");
+    lv_obj_set_style_text_font(label, &lv_font_montserrat_24, LV_PART_MAIN); // 使用大字体
+    lv_obj_center(label);
+
+    xSemaphoreGive(g_lvgl_mux);
+
+    // 4. LVGL 核心循环
+    while (1) {
+        // 延时 10ms
+        vTaskDelay(pdMS_TO_TICKS(10));
+
+        // 告诉 LVGL 过去了 10ms (如果你在 lv_conf.h 中开启了 LV_TICK_CUSTOM，这句可以注释掉，但保留也无妨)
+        lv_tick_inc(10);
+
+        // 运行 LVGL 渲染引擎 (加锁)
+        if (xSemaphoreTake(g_lvgl_mux, pdMS_TO_TICKS(10)) == pdTRUE) {
+            lv_timer_handler();
+            xSemaphoreGive(g_lvgl_mux);
+        }
+    }
+}
+
+// ============================================================================
+// 原有的测试任务与按键任务
 // ============================================================================
 void tts_test_task(void *pvParameters) {
     ESP_LOGI(TAG, "Waiting for Wi-Fi connection...");
-    
-    // 阻塞等待 Wi-Fi 连接成功
     while (Mgr_Wifi_GetStatus() != WIFI_STATUS_CONNECTED) {
         vTaskDelay(pdMS_TO_TICKS(500));
     }
-    
-    // 稍微等 1 秒，让网络底层彻底稳定
     vTaskDelay(pdMS_TO_TICKS(1000));
-    
     ESP_LOGI(TAG, "Wi-Fi Connected! Starting TTS Test...");
-    
-    // 设置一个合适的音量 (0-100)
-    Dev_Audio_Set_Volume(30); 
-    
-    // 触发流式语音合成与播放 (阻塞函数)
+    Dev_Audio_Set_Volume(80); 
     Agent_TTS_Play("网络连接成功，我是你的智能台灯。很高兴为你服务！");
-    
     ESP_LOGI(TAG, "TTS Test Task Finished.");
-    vTaskDelete(NULL); // 测试完毕，销毁任务
+    vTaskDelete(NULL); 
 }
-// ============================================================================
 
 void Key_Task(void *pvParameters) {
     ESP_LOGI(TAG, "Key Task Started");
@@ -90,12 +135,13 @@ void app_main(void) {
         .sample_rate = AUDIO_SAMPLE_RATE
     };
     Dev_Audio_Init(&audio_cfg);
-
-    // 初始化音频服务 (内部会创建运行在 Core 1 的播放任务)
     Svc_Audio_Init();
 
-    // [新增] 启动 TTS 测试任务
-    xTaskCreatePinnedToCore(tts_test_task, "TTS_Test", 8192, NULL, 5, NULL, 0);
+    // [新增] 启动 GUI 任务，绑定到 Core 1，优先级设为 5 (较高)
+    xTaskCreatePinnedToCore(gui_task, "GUI_Task", 1024 * 8, NULL, 5, NULL, 1);
+
+    // 启动 TTS 测试任务 (Core 0)
+    xTaskCreatePinnedToCore(tts_test_task, "TTS_Test", 8192, NULL, 4, NULL, 0);
 
     // 初始化 STM32 串口通信
     Dev_STM32_Init();
@@ -105,7 +151,7 @@ void app_main(void) {
     static Key_t s_UserKey; 
     Key_Init(&s_UserKey, 1, BOARD_BUTTON_PIN, 0); 
     KeyManager_Register(&s_UserKey);
-    xTaskCreate(Key_Task, "Key_Task", 2048, NULL, 5, NULL);
+    xTaskCreatePinnedToCore(Key_Task, "Key_Task", 2048, NULL, 5, NULL, 0);
 
     // 3. 启动神经中枢
     Service_Core_Init();
