@@ -7,6 +7,10 @@
 功能          STM32引脚      配置模式                备注
 UART1_TX      PA9           复用推挽输出            DMA1_Channel4 (发送)
 UART1_RX      PA10          浮空/上拉输入           DMA1_Channel5 (循环接收)
+
+# TX_to_STM32       : GPIO 17  (发送 - 接 STM32 PA10)
+# RX_from_STM32     : GPIO 18  (接收 - 接 STM32 PA9)
+
 GND           GND           共地                    必须连接
 -------------------------------------------------------------------
 * 波特率: 115200 bps
