@@ -20,6 +20,7 @@
 // --- 新增 UI 相关头文件 ---
 #include "lvgl.h"
 #include "ui_port.h"
+#include "ui_main.h"
 
 static const char *TAG = "MAIN";
 
@@ -40,25 +41,11 @@ static void gui_task(void *arg) {
 
     // 2. 初始化屏幕底层与 LVGL
     UI_Port_Disp_Init();
+    UI_Port_Touch_Init(); // <--- 新增：初始化触摸
 
-    // 3. 绘制一个测试界面 (加锁)
+    // 3. 构建主界面 (加锁)
     xSemaphoreTake(g_lvgl_mux, portMAX_DELAY);
-    
-    // 设置屏幕背景色为深灰色
-    lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x333333), LV_PART_MAIN);
-
-    // 创建一个按钮
-    lv_obj_t * btn = lv_btn_create(lv_scr_act());
-    lv_obj_align(btn, LV_ALIGN_CENTER, 0, 0); // 居中对齐
-    lv_obj_set_size(btn, 200, 80);
-    lv_obj_set_style_bg_color(btn, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN); // 红色按钮
-
-    // 在按钮上创建标签
-    lv_obj_t * label = lv_label_create(btn);
-    lv_label_set_text(label, "Hello LVGL!");
-    lv_obj_set_style_text_font(label, &lv_font_montserrat_24, LV_PART_MAIN); // 使用大字体
-    lv_obj_center(label);
-
+    UI_Main_Init(); // <--- 替换在这里
     xSemaphoreGive(g_lvgl_mux);
 
     // 4. LVGL 核心循环

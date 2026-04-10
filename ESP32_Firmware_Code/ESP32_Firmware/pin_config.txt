@@ -19,21 +19,21 @@
 
 # ------------------------------------------------------------------------------
 # [2] 视觉系统 (Display - 8080 Parallel Interface)
-# 设备: ILI9486 (LCD) - 8位并行 + DMA
+# 设备: ILI9341 (LCD) - 8位并行 + DMA
 # 性能: 理论刷新率 > 50 FPS
 # 位置: 左侧排针连续引脚
 # ------------------------------------------------------------------------------
-# LCD_D0            : GPIO 4   (数据总线 D0)
-# LCD_D1            : GPIO 5   (数据总线 D1)
-# LCD_D2            : GPIO 6   (数据总线 D2)
-# LCD_D3            : GPIO 7   (数据总线 D3)
-# LCD_D4            : GPIO 8   (数据总线 D4)
-# LCD_D5            : GPIO 9   (数据总线 D5)
-# LCD_D6            : GPIO 10  (数据总线 D6)
-# LCD_D7            : GPIO 11  (数据总线 D7)
+# LCD_D8            : GPIO 4   (数据总线 D0)
+# LCD_D9            : GPIO 5   (数据总线 D1)
+# LCD_D10           : GPIO 6   (数据总线 D2)
+# LCD_D11           : GPIO 7   (数据总线 D3)
+# LCD_D12           : GPIO 8   (数据总线 D4)
+# LCD_D13           : GPIO 9   (数据总线 D5)
+# LCD_D14           : GPIO 10  (数据总线 D6)
+# LCD_D15           : GPIO 11  (数据总线 D7)
 # LCD_WR            : GPIO 12  (写入触发 - 写时钟)
 # LCD_CS            : GPIO 13  (片选 - 选中屏幕)
-# LCD_DC            : GPIO 14  (数据/命令切换)
+# LCD_DC(RS)        : GPIO 14  (数据/命令切换)
 # LCD_RST           : GPIO 15  (硬件复位)
 # LCD_BL            : GPIO 16  (背光控制 - PWM 调光，建议接 5V)
 
@@ -91,7 +91,7 @@
 # Touch_MOSI        : GPIO 2   (SPI 数据写)
 # Touch_MISO        : GPIO 47  (SPI 数据读)
 # Touch_CS          : GPIO 38  (片选 - 选中触摸芯片)
-# Touch_IRQ         : GPIO 46  (触摸中断 - 按下触发低电平)
+# Touch_IRQ(PEN)    : GPIO 46  (触摸中断 - 按下触发低电平)
 
 # ------------------------------------------------------------------------------
 # [6] 验证外设 (Verification)
