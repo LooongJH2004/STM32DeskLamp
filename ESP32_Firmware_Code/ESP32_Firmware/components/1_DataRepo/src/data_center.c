@@ -1,15 +1,16 @@
 #include "data_center.h"
+#include "storage_nvs.h" // [新增] 引入 NVS 存储模块
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "event_bus.h"
-#include "app_config.h" // 引入调试宏
+#include "app_config.h"
 #include <string.h>
 
 static const char *TAG = "DataCenter";
 
-// 内部全局数据树
 typedef struct {
     DC_LightingData_t lighting;
+    DC_SystemData_t   system; // [新增]
     DC_EnvData_t      env;
     DC_TimerData_t    timer;
 } GlobalDataTree_t;
@@ -17,25 +18,21 @@ typedef struct {
 static GlobalDataTree_t s_DataTree;
 static SemaphoreHandle_t s_Mutex = NULL;
 
-// ============================================================
-// 初始化与调试
-// ============================================================
-
 void DataCenter_Init(void) {
-    if (s_Mutex == NULL) {
-        s_Mutex = xSemaphoreCreateMutex();
-    }
-
+    if (s_Mutex == NULL) s_Mutex = xSemaphoreCreateMutex();
     xSemaphoreTake(s_Mutex, portMAX_DELAY);
     
-    // 赋予合理的初始默认值
-    s_DataTree.lighting.power = true; // 默认开灯状态，方便调试
+    // 默认值 (如果 NVS 中有数据，稍后会被覆盖)
+    s_DataTree.lighting.power = true; 
     s_DataTree.lighting.brightness = 50;
-    s_DataTree.lighting.color_temp = 50; // 中性光
+    s_DataTree.lighting.color_temp = 50; 
+
+    s_DataTree.system.volume = 50;            // 默认音量 50%
+    s_DataTree.system.screen_brightness = 80; // 默认屏幕亮度 80%
 
     s_DataTree.env.indoor_temp = 25;
     s_DataTree.env.indoor_hum = 50;
-    s_DataTree.env.indoor_lux = 0; // [新增]
+    s_DataTree.env.indoor_lux = 0; 
     strcpy(s_DataTree.env.outdoor_weather, "未知");
     s_DataTree.env.outdoor_temp = 0;
 
@@ -44,8 +41,91 @@ void DataCenter_Init(void) {
     s_DataTree.timer.total_sec = 0;
 
     xSemaphoreGive(s_Mutex);
-    
     APP_LOGI(TAG, "Data Center Initialized.");
+}
+
+// --- Lighting ---
+void DataCenter_Get_Lighting(DC_LightingData_t *out_data) {
+    if (!out_data) return;
+    xSemaphoreTake(s_Mutex, portMAX_DELAY);
+    *out_data = s_DataTree.lighting; 
+    xSemaphoreGive(s_Mutex);
+}
+
+void DataCenter_Set_Lighting(const DC_LightingData_t *in_data) {
+    if (!in_data) return;
+    bool changed = false;
+    xSemaphoreTake(s_Mutex, portMAX_DELAY);
+    if (memcmp(&s_DataTree.lighting, in_data, sizeof(DC_LightingData_t)) != 0) {
+        s_DataTree.lighting = *in_data;
+        changed = true;
+    }
+    xSemaphoreGive(s_Mutex);
+
+    if (changed) {
+        EventBus_Send(EVT_DATA_LIGHT_CHANGED, NULL, 0);
+        Storage_NVS_RequestSave(); // [关键] 触发防抖保存
+    }
+}
+
+// --- System [新增] ---
+void DataCenter_Get_System(DC_SystemData_t *out_data) {
+    if (!out_data) return;
+    xSemaphoreTake(s_Mutex, portMAX_DELAY);
+    *out_data = s_DataTree.system; 
+    xSemaphoreGive(s_Mutex);
+}
+
+void DataCenter_Set_System(const DC_SystemData_t *in_data) {
+    if (!in_data) return;
+    bool changed = false;
+    xSemaphoreTake(s_Mutex, portMAX_DELAY);
+    if (memcmp(&s_DataTree.system, in_data, sizeof(DC_SystemData_t)) != 0) {
+        s_DataTree.system = *in_data;
+        changed = true;
+    }
+    xSemaphoreGive(s_Mutex);
+
+    if (changed) {
+        EventBus_Send(EVT_DATA_SYS_CHANGED, NULL, 0);
+        Storage_NVS_RequestSave(); // [关键] 触发防抖保存
+    }
+}
+
+// --- Env & Timer (保持不变，且不触发 NVS 保存) ---
+void DataCenter_Get_Env(DC_EnvData_t *out_data) {
+    if (!out_data) return;
+    xSemaphoreTake(s_Mutex, portMAX_DELAY);
+    *out_data = s_DataTree.env;
+    xSemaphoreGive(s_Mutex);
+}
+void DataCenter_Set_Env(const DC_EnvData_t *in_data) {
+    if (!in_data) return;
+    bool changed = false;
+    xSemaphoreTake(s_Mutex, portMAX_DELAY);
+    if (memcmp(&s_DataTree.env, in_data, sizeof(DC_EnvData_t)) != 0) {
+        s_DataTree.env = *in_data;
+        changed = true;
+    }
+    xSemaphoreGive(s_Mutex);
+    if (changed) EventBus_Send(EVT_DATA_ENV_CHANGED, NULL, 0);
+}
+void DataCenter_Get_Timer(DC_TimerData_t *out_data) {
+    if (!out_data) return;
+    xSemaphoreTake(s_Mutex, portMAX_DELAY);
+    *out_data = s_DataTree.timer;
+    xSemaphoreGive(s_Mutex);
+}
+void DataCenter_Set_Timer(const DC_TimerData_t *in_data) {
+    if (!in_data) return;
+    bool changed = false;
+    xSemaphoreTake(s_Mutex, portMAX_DELAY);
+    if (memcmp(&s_DataTree.timer, in_data, sizeof(DC_TimerData_t)) != 0) {
+        s_DataTree.timer = *in_data;
+        changed = true;
+    }
+    xSemaphoreGive(s_Mutex);
+    if (changed) EventBus_Send(EVT_DATA_TIMER_CHANGED, NULL, 0);
 }
 
 void DataCenter_PrintStatus(void) {
@@ -65,72 +145,3 @@ void DataCenter_PrintStatus(void) {
     xSemaphoreGive(s_Mutex);
 #endif
 }
-
-// ============================================================
-// Getter / Setter 实现 (深拷贝 + 事件触发)
-// ============================================================
-
-void DataCenter_Get_Lighting(DC_LightingData_t *out_data) {
-    if (!out_data) return;
-    xSemaphoreTake(s_Mutex, portMAX_DELAY);
-    *out_data = s_DataTree.lighting; // 结构体深拷贝
-    xSemaphoreGive(s_Mutex);
-}
-
-void DataCenter_Set_Lighting(const DC_LightingData_t *in_data) {
-    if (!in_data) return;
-    bool changed = false;
-
-    xSemaphoreTake(s_Mutex, portMAX_DELAY);
-    // 简单判断是否发生变化 (可根据需要细化)
-    if (memcmp(&s_DataTree.lighting, in_data, sizeof(DC_LightingData_t)) != 0) {
-        s_DataTree.lighting = *in_data;
-        changed = true;
-    }
-    xSemaphoreGive(s_Mutex);
-
-    // 如果数据变了，抛出事件通知其他模块 (如 LVGL, STM32 串口任务)
-    if (changed) {
-        EventBus_Send(EVT_DATA_LIGHT_CHANGED, NULL, 0);
-        APP_LOGI(TAG, "Lighting Data Updated -> Event Sent");
-    }
-}
-
-void DataCenter_Get_Env(DC_EnvData_t *out_data) {
-    if (!out_data) return;
-    xSemaphoreTake(s_Mutex, portMAX_DELAY);
-    *out_data = s_DataTree.env;
-    xSemaphoreGive(s_Mutex);
-}
-
-void DataCenter_Set_Env(const DC_EnvData_t *in_data) {
-    if (!in_data) return;
-    bool changed = false;
-    xSemaphoreTake(s_Mutex, portMAX_DELAY);
-    if (memcmp(&s_DataTree.env, in_data, sizeof(DC_EnvData_t)) != 0) {
-        s_DataTree.env = *in_data;
-        changed = true;
-    }
-    xSemaphoreGive(s_Mutex);
-    if (changed) EventBus_Send(EVT_DATA_ENV_CHANGED, NULL, 0);
-}
-
-void DataCenter_Get_Timer(DC_TimerData_t *out_data) {
-    if (!out_data) return;
-    xSemaphoreTake(s_Mutex, portMAX_DELAY);
-    *out_data = s_DataTree.timer;
-    xSemaphoreGive(s_Mutex);
-}
-
-void DataCenter_Set_Timer(const DC_TimerData_t *in_data) {
-    if (!in_data) return;
-    bool changed = false;
-    xSemaphoreTake(s_Mutex, portMAX_DELAY);
-    if (memcmp(&s_DataTree.timer, in_data, sizeof(DC_TimerData_t)) != 0) {
-        s_DataTree.timer = *in_data;
-        changed = true;
-    }
-    xSemaphoreGive(s_Mutex);
-    if (changed) EventBus_Send(EVT_DATA_TIMER_CHANGED, NULL, 0);
-}
-

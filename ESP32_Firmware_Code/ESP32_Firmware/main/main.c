@@ -1,93 +1,138 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "freertos/event_groups.h"
+#include "freertos/semphr.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
-#include "esp_wifi.h"
-#include "esp_event.h"
-#include "dev_csi.h"
 
-static const char *TAG = "MAIN_TEST";
+#include "manager/mgr_wifi.h"
+#include "dev_audio.h"
+#include "dev_stm32.h" 
+#include "dev_csi.h"       // [新增] 雷达
+#include "app_config.h"
+#include "service_core.h"
+#include "event_bus.h"
+#include "data_center.h"
+#include "storage_nvs.h"   // [新增] 掉电保存
 
-// 【请修改为你的 Wi-Fi】
-#define MY_WIFI_SSID      "long"
-#define MY_WIFI_PASS      "12345678"
+#include "KeyManager.h"
+#include "Key.h"
+#include "svc_audio.h" 
+#include "agents/agent_baidu_tts.h"
 
-// 事件组，用于通知 main 任务 Wi-Fi 已连接
-static EventGroupHandle_t s_wifi_event_group;
-#define WIFI_CONNECTED_BIT BIT0
+// --- UI 相关头文件 ---
+#include "lvgl.h"
+#include "ui_port.h"
+#include "ui_main.h"
 
-// ============================================================
-// CSI 状态改变回调函数 (模拟台灯业务逻辑)
-// ============================================================
+static const char *TAG = "MAIN";
+
+#define MY_WIFI_SSID      "CMCC-2079"
+#define MY_WIFI_PASS      "88888888"
+
+SemaphoreHandle_t g_lvgl_mux;
+
+// ============================================================================
+// 1. CSI 雷达回调 (联动 DataCenter)
+// ============================================================================
 static void my_csi_presence_callback(bool is_present) {
+    DC_LightingData_t light;
+    DataCenter_Get_Lighting(&light);
+
     if (is_present) {
-        ESP_LOGW(TAG, "=====================================");
-        ESP_LOGW(TAG, " 🚶‍♂️ 捕捉到动作！(人靠近或微动)");
-        ESP_LOGW(TAG, " 💡 执行：【打开台灯】 (重置关灯倒计时)");
-        ESP_LOGW(TAG, "=====================================");
+        ESP_LOGW(TAG, "🚶‍♂️ 捕捉到动作！ -> 执行【开灯】");
+        light.power = true;
     } else {
-        ESP_LOGW(TAG, "=====================================");
-        ESP_LOGW(TAG, " 👻 连续 15 秒没有任何微动！");
-        ESP_LOGW(TAG, " 📴 执行：【关闭台灯】 (判定人已离开)");
-        ESP_LOGW(TAG, "=====================================");
+        ESP_LOGW(TAG, "👻 连续 15 秒无人！ -> 执行【关灯】");
+        light.power = false;
     }
-}
-
-// ============================================================
-// Wi-Fi 事件处理 (支持断线无限重连)
-// ============================================================
-static void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data) {
-    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
-        ESP_LOGI(TAG, "Wi-Fi Started. Connecting...");
-        esp_wifi_connect();
-    } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
-        ESP_LOGW(TAG, "Wi-Fi Disconnected. Retrying in 2 seconds...");
-        vTaskDelay(pdMS_TO_TICKS(2000)); 
-        esp_wifi_connect(); 
-        xEventGroupClearBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
-    } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
-        ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
-        ESP_LOGI(TAG, "Got IP: " IPSTR, IP2STR(&event->ip_info.ip));
-        xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT); 
-    }
-}
-
-static void wifi_init_sta(void) {
-    s_wifi_event_group = xEventGroupCreate();
-
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-    esp_netif_create_default_wifi_sta();
-
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-
-    esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL, NULL);
-    esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &wifi_event_handler, NULL, NULL);
-
-    wifi_config_t wifi_config = {
-        .sta = {
-            .ssid = MY_WIFI_SSID,
-            .password = MY_WIFI_PASS,
-            .threshold.authmode = WIFI_AUTH_WPA2_PSK,
-            .pmf_cfg = { .capable = true, .required = false },
-        },
-    };
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
     
-    // 1. 启动 Wi-Fi
-    ESP_ERROR_CHECK(esp_wifi_start());
-
-    // 2. 【关键修复】彻底关闭 Wi-Fi 睡眠模式，让天线 100% 保持全开监听！
-    // 这将极大提高 CSI 采样的稳定性和数量。
-    ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE)); 
+    // 写入数据中心 (内部会自动触发 3 秒防抖保存，并同步给 UI 和 STM32)
+    DataCenter_Set_Lighting(&light);
 }
 
-void app_main(void) {
-    ESP_LOGI(TAG, "--- CSI Presence Detection Test ---");
+// ============================================================================
+// 2. LVGL 渲染任务 (Core 1)
+// ============================================================================
+static void gui_task(void *arg) {
+    ESP_LOGI(TAG, "GUI Task Started on Core 1");
+    g_lvgl_mux = xSemaphoreCreateMutex();
 
+    UI_Port_Disp_Init();
+    UI_Port_Touch_Init(); 
+
+    xSemaphoreTake(g_lvgl_mux, portMAX_DELAY);
+    UI_Main_Init(); 
+    xSemaphoreGive(g_lvgl_mux);
+
+    while (1) {
+        vTaskDelay(pdMS_TO_TICKS(10));
+        lv_tick_inc(10);
+        if (xSemaphoreTake(g_lvgl_mux, pdMS_TO_TICKS(10)) == pdTRUE) {
+            lv_timer_handler();
+            xSemaphoreGive(g_lvgl_mux);
+        }
+    }
+}
+
+// ============================================================================
+// 3. Wi-Fi 连接后的初始化任务 (启动雷达 & TTS 测试)
+// ============================================================================
+void on_wifi_connected_task(void *pvParameters) {
+    ESP_LOGI(TAG, "Waiting for Wi-Fi connection...");
+    while (Mgr_Wifi_GetStatus() != WIFI_STATUS_CONNECTED) {
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    ESP_LOGI(TAG, "Wi-Fi Connected! Starting CSI and TTS Test...");
+    
+    // 1. 启动 CSI 雷达
+    Dev_CSI_Init(my_csi_presence_callback);
+
+    // 2. 播报开机语音
+    Dev_Audio_Set_Volume(80); 
+    Agent_TTS_Play("网络连接成功，我是你的智能台灯。很高兴为你服务！");
+    
+    ESP_LOGI(TAG, "Post-WiFi Init Task Finished.");
+    vTaskDelete(NULL); 
+}
+
+// ============================================================================
+// 4. 物理按键任务
+// ============================================================================
+void Key_Task(void *pvParameters) {
+    ESP_LOGI(TAG, "Key Task Started");
+    KeyEvent_t key_evt;
+    while (1) {
+        KeyManager_Tick();
+        if (KeyManager_GetEvent(&key_evt)) {
+            switch (key_evt.Type) {
+                case KEY_EVT_CLICK:
+                    ESP_LOGI(TAG, "Physical Key Click!");
+                    EventBus_Send(EVT_KEY_CLICK, NULL, 0);
+                    break;
+                case KEY_EVT_DOUBLE_CLICK:
+                    ESP_LOGI(TAG, "Physical Key Double Click!");
+                    EventBus_Send(EVT_KEY_DOUBLE_CLICK, NULL, 0);
+                    break;
+                case KEY_EVT_HOLD_START:
+                    ESP_LOGI(TAG, "Physical Key Hold Start");
+                    EventBus_Send(EVT_KEY_LONG_PRESS, NULL, 0);
+                    break;
+                default:
+                    break;
+            }
+        }
+        vTaskDelay(pdMS_TO_TICKS(10)); 
+    }
+}
+
+// ============================================================================
+// 5. 主函数
+// ============================================================================
+void app_main(void) {
+    ESP_LOGI(TAG, "=== System Start ===");
+
+    // 0. 底层 NVS 初始化 (必须最先执行)
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
@@ -95,16 +140,53 @@ void app_main(void) {
     }
     ESP_ERROR_CHECK(ret);
 
-    wifi_init_sta();
+    // 1. 核心数据与事件总线
+    EventBus_Init();
+    DataCenter_Init(); 
+    Storage_NVS_Init();      // 初始化防抖定时器
+    Storage_NVS_Load_All();  // 从 Flash 加载上次关机前的数据
 
-    ESP_LOGI(TAG, "Waiting for Wi-Fi connection...");
-    xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
-    ESP_LOGI(TAG, "Wi-Fi Connected! Now starting CSI...");
+    // 2. 网络与音频底层
+    Mgr_Wifi_Init();
+    Audio_Config_t audio_cfg = {
+        .bck_io_num = AUDIO_I2S_BCK_PIN,
+        .ws_io_num = AUDIO_I2S_WS_PIN,
+        .data_in_num = AUDIO_I2S_DATA_IN_PIN,
+        .data_out_num = AUDIO_I2S_DATA_OUT_PIN, 
+        .sample_rate = AUDIO_SAMPLE_RATE
+    };
+    Dev_Audio_Init(&audio_cfg);
+    Svc_Audio_Init();
 
-    // 启动 CSI 监听
-    Dev_CSI_Init(my_csi_presence_callback);
+    // 3. 启动 GUI 任务 (Core 1)
+    xTaskCreatePinnedToCore(gui_task, "GUI_Task", 1024 * 8, NULL, 5, NULL, 1);
 
-    while (1) {
+    // 4. 初始化 STM32 串口通信
+    Dev_STM32_Init();
+
+    // 5. 按键初始化
+    KeyManager_Init();
+    static Key_t s_UserKey; 
+    Key_Init(&s_UserKey, 1, BOARD_BUTTON_PIN, 0); 
+    KeyManager_Register(&s_UserKey);
+    xTaskCreatePinnedToCore(Key_Task, "Key_Task", 2048, NULL, 5, NULL, 0);
+
+    // 6. 启动神经中枢 (业务逻辑状态机)
+    Service_Core_Init();
+
+    // 7. 启动网络连接
+    Mgr_Wifi_Connect(MY_WIFI_SSID, MY_WIFI_PASS);
+
+    // 8. 启动连网后的异步任务 (雷达 & TTS)
+    xTaskCreatePinnedToCore(on_wifi_connected_task, "Post_WiFi", 8192, NULL, 4, NULL, 0);
+
+    // 9. 主循环空转
+    int loop_count = 0;
+    while(1) {
+        if (loop_count % 5 == 0) {
+            DataCenter_PrintStatus();
+        }
+        loop_count++;
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
