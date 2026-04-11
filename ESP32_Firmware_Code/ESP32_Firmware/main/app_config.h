@@ -44,12 +44,14 @@
 
 // --- LampMind Server Settings ---
 // 请将 IP 替换为你运行后端服务的电脑的局域网 IP
-#define LAMPMIND_SERVER_URL     "http://192.168.10.8:8000/chat" 
+#define LAMPMIND_SERVER_URL     "http://192.168.10.150:8000/chat" 
 #define LAMPMIND_DEVICE_ID      "esp32_001"
+//192.168.10.8 笔记本
+//192.168.10.150 新pc
 
 // --- MQTT Configuration ---
 // 请修改为你电脑的局域网 IP，端口通常是 1883
-#define MQTT_BROKER_URI         "mqtt://192.168.10.8:1883" 
+#define MQTT_BROKER_URI         "mqtt://192.168.10.150:1883" 
 
 // 订阅主题：接收 Python 发来的控制指令
 #define MQTT_TOPIC_CTRL         "device/lamp/ctrl"
