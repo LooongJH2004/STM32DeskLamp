@@ -1,7 +1,17 @@
 {
-  "broker": "192.168.10.8",
-  "port": 1883,
-  "client_id": "Python_Control_Panel",
+  "active_profile": "desktop_local",
+  "profiles": {
+    "desktop_local": {
+      "broker": "127.0.0.1",
+      "port": 1883,
+      "client_id": "Python_Control_Panel_PC"
+    },
+    "laptop_demo": {
+      "broker": "192.168.10.8",
+      "port": 1883,
+      "client_id": "Python_Control_Panel_Laptop"
+    }
+  },
   "topic_ctrl": "device/lamp/ctrl",
   "topic_status": "device/lamp/status"
 }
