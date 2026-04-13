@@ -1,15 +1,19 @@
 #pragma once
 #include <stdbool.h>
+#include <stdint.h>
 
 /**
  * @brief CSI 状态改变回调函数类型
- * @param is_present true: 检测到活动 (有人); false: 环境静止 (无人/离开)
  */
 typedef void (*csi_presence_cb_t)(bool is_present);
 
 /**
  * @brief 初始化 Wi-Fi CSI 监听模块
- * @param cb 状态改变时的回调函数
- * @note 必须在 Wi-Fi 初始化 (esp_wifi_init) 之后调用
  */
 void Dev_CSI_Init(csi_presence_cb_t cb);
+
+/**
+ * @brief 动态切换 CSI 算法模式
+ * @param mode 1: 归一化轮廓绝对差值法; 2: 宏观总振幅极差法; 3: 轮廓均方误差与截尾滤波法
+ */
+void Dev_CSI_Set_Mode(uint8_t mode);

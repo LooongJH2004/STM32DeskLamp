@@ -24,6 +24,9 @@
 #include "ui_port.h"
 #include "ui_main.h"
 
+#include <stdio.h>
+#include <string.h>
+
 static const char *TAG = "MAIN";
 
 #define MY_WIFI_SSID      "CMCC-2079"
@@ -127,6 +130,34 @@ void Key_Task(void *pvParameters) {
 }
 
 // ============================================================================
+// [新增] PC 串口指令监听任务 (用于动态切换 CSI 算法)
+// ============================================================================
+static void pc_uart_cmd_task(void *arg) {
+    ESP_LOGI(TAG, "PC UART Command Listener Started. Type 'csi1', 'csi2', or 'csi3' to switch modes.");
+    char line[128];
+    
+    while (1) {
+        // 阻塞读取标准输入 (PC 串口助手发来的数据)
+        if (fgets(line, sizeof(line), stdin) != NULL) {
+            // 去除换行符
+            line[strcspn(line, "\r\n")] = 0;
+            
+            if (strcmp(line, "csi1") == 0) {
+                Dev_CSI_Set_Mode(1);
+            } else if (strcmp(line, "csi2") == 0) {
+                Dev_CSI_Set_Mode(2);
+            } else if (strcmp(line, "csi3") == 0) {
+                Dev_CSI_Set_Mode(3);
+            } else if (strlen(line) > 0) {
+                ESP_LOGW(TAG, "Unknown command: %s", line);
+            }
+        }
+        vTaskDelay(pdMS_TO_TICKS(50));
+    }
+}
+
+
+// ============================================================================
 // 5. 主函数
 // ============================================================================
 void app_main(void) {
@@ -179,6 +210,10 @@ void app_main(void) {
 
     // 8. 启动连网后的异步任务 (雷达 & TTS)
     xTaskCreatePinnedToCore(on_wifi_connected_task, "Post_WiFi", 8192, NULL, 4, NULL, 0);
+
+    // [新增] 启动 PC 串口指令监听任务
+    xTaskCreatePinnedToCore(pc_uart_cmd_task, "PC_Cmd_Task", 3072, NULL, 2, NULL, 0);
+
 
     // 9. 主循环空转
     int loop_count = 0;
