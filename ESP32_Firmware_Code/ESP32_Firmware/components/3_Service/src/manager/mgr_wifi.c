@@ -14,6 +14,46 @@
 
 static const char *TAG = "Mgr_Wifi";
 
+// --- 新增：Wi-Fi 信息全局实例 ---
+static wifi_information s_wifi_info;
+
+void wifi_information_init(void) {
+    memset(&s_wifi_info, 0, sizeof(wifi_information));
+    s_wifi_info.is_ready = false;
+    ESP_LOGI(TAG, "WiFi information initialized (cleared).");
+}
+
+const char* get_wifi_name(void) {
+    return s_wifi_info.ssid;
+}
+
+const char* get_wifi_password(void) {
+    return s_wifi_info.password;
+}
+
+void set_wifi_name(const char *ssid) {
+    if (ssid) {
+        strncpy(s_wifi_info.ssid, ssid, sizeof(s_wifi_info.ssid) - 1);
+        s_wifi_info.ssid[sizeof(s_wifi_info.ssid) - 1] = '\0';
+        ESP_LOGI(TAG, "WiFi SSID set to: %s", s_wifi_info.ssid);
+        if (strlen(s_wifi_info.password) > 0) s_wifi_info.is_ready = true;
+    }
+}
+
+void set_wifi_password(const char *password) {
+    if (password) {
+        strncpy(s_wifi_info.password, password, sizeof(s_wifi_info.password) - 1);
+        s_wifi_info.password[sizeof(s_wifi_info.password) - 1] = '\0';
+        ESP_LOGI(TAG, "WiFi Password set.");
+        if (strlen(s_wifi_info.ssid) > 0) s_wifi_info.is_ready = true;
+    }
+}
+
+bool is_wifi_info_ready(void) {
+    return s_wifi_info.is_ready;
+}
+
+
 // 状态记录
 static Wifi_Status_t s_wifi_status = WIFI_STATUS_IDLE;
 static int s_retry_num = 0;
