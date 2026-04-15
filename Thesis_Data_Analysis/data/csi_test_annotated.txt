@@ -1,0 +1,100 @@
+I (103955) Dev_STM32: [RX] {"ev":"hb","up":124711}|D520|0000
+I (103985) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":662}|4DA7|0000
+I (103985) DataCenter: === Data Center Status ===
+I (103985) DataCenter: [Light] Power:1, Bri:0%, CCT:70%
+I (103985) DataCenter: [Env]   InTemp:23C, InHum:77%, InLux:662, OutWeather:未知, OutTemp:0C
+I (103995) DataCenter: [Timer] State:0, Remain:0 s
+I (103995) DataCenter: ==========================
+<静止>
+I (104145) Dev_CSI: [雷达-V3] 得分:  177 | 阈值: 250
+I (104645) Dev_CSI: [雷达-V3] 得分:  189 | 阈值: 250
+I (105145) Dev_CSI: [雷达-V3] 得分:  187 | 阈值: 250
+I (105645) Dev_CSI: [雷达-V3] 得分:  218 | 阈值: 250
+I (105965) Dev_STM32: [RX] {"ev":"hb","up":124712}|8073|0000
+I (105985) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":663}|7E96|0000
+I (106145) Dev_CSI: [雷达-V3] 得分:  204 | 阈值: 250
+I (106645) Dev_CSI: [雷达-V3] 得分:  176 | 阈值: 250
+I (107145) Dev_CSI: [雷达-V3] 得分:  198 | 阈值: 250
+I (107645) Dev_CSI: [雷达-V3] 得分:  176 | 阈值: 250
+I (107965) Dev_STM32: [RX] {"ev":"hb","up":124713}|B342|0000
+I (107985) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":662}|4DA7|0000
+I (108145) Dev_CSI: [雷达-V3] 得分:  194 | 阈值: 250
+I (108645) Dev_CSI: [雷达-V3] 得分:  236 | 阈值: 250
+I (109005) DataCenter: === Data Center Status ===
+I (109005) DataCenter: [Light] Power:1, Bri:0%, CCT:70%
+I (109005) DataCenter: [Env]   InTemp:23C, InHum:77%, InLux:662, OutWeather:未知, OutTemp:0C
+I (109005) DataCenter: [Timer] State:0, Remain:0 s
+I (109015) DataCenter: ==========================
+I (109145) Dev_CSI: [雷达-V3] 得分:  201 | 阈值: 250
+I (109645) Dev_CSI: [雷达-V3] 得分:  188 | 阈值: 250
+I (109965) Dev_STM32: [RX] {"ev":"hb","up":124714}|2AD5|0000
+I (109985) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":662}|4DA7|0000
+I (110145) Dev_CSI: [雷达-V3] 得分:  220 | 阈值: 250
+</静止>
+
+<微动>
+I (110645) Dev_CSI: [雷达-V3] 得分:  372 | 阈值: 250
+I (111145) Dev_CSI: [雷达-V3] 得分:  400 | 阈值: 250
+I (111645) Dev_CSI: [雷达-V3] 得分:  417 | 阈值: 250
+I (111965) Dev_STM32: [RX] {"ev":"hb","up":124715}|19E4|0000
+I (111985) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":663}|7E96|0000
+I (112145) Dev_CSI: [雷达-V3] 得分:  366 | 阈值: 250
+I (112645) Dev_CSI: [雷达-V3] 得分:  355 | 阈值: 250
+I (113145) Dev_CSI: [雷达-V3] 得分:  310 | 阈值: 250
+
+</微动>
+
+<活动>
+I (113645) Dev_CSI: [雷达-V3] 得分:  532 | 阈值: 250
+I (113965) Dev_STM32: [RX] {"ev":"hb","up":124716}|4CB7|0000
+I (113985) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":663}|7E96|0000
+I (114015) DataCenter: === Data Center Status ===
+I (114015) DataCenter: [Light] Power:1, Bri:0%, CCT:70%
+I (114015) DataCenter: [Env]   InTemp:23C, InHum:77%, InLux:663, OutWeather:未知, OutTemp:0C
+I (114015) DataCenter: [Timer] State:0, Remain:0 s
+I (114025) DataCenter: ==========================
+I (114145) Dev_CSI: [雷达-V3] 得分: 2898 | 阈值: 250
+I (114645) Dev_CSI: [雷达-V3] 得分: 3254 | 阈值: 250
+I (115145) Dev_CSI: [雷达-V3] 得分: 3120 | 阈值: 250
+I (115645) Dev_CSI: [雷达-V3] 得分: 1980 | 阈值: 250
+I (115965) Dev_STM32: [RX] {"ev":"hb","up":124717}|7F86|0000
+I (115985) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":662}|4DA7|0000
+I (116145) Dev_CSI: [雷达-V3] 得分: 1231 | 阈值: 250
+I (116645) Dev_CSI: [雷达-V3] 得分: 2169 | 阈值: 250
+I (117145) Dev_CSI: [雷达-V3] 得分: 1932 | 阈值: 250
+I (117645) Dev_CSI: [雷达-V3] 得分: 2514 | 阈值: 250
+I (117965) Dev_STM32: [RX] {"ev":"hb","up":124718}|6FB8|0000
+I (117985) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":663}|7E96|0000
+I (118145) Dev_CSI: [雷达-V3] 得分: 2377 | 阈值: 250
+I (118645) Dev_CSI: [雷达-V3] 得分: 1231 | 阈值: 250
+I (119025) DataCenter: === Data Center Status ===
+I (119025) DataCenter: [Light] Power:1, Bri:0%, CCT:70%
+I (119025) DataCenter: [Env]   InTemp:23C, InHum:77%, InLux:663, OutWeather:未知, OutTemp:0C
+I (119025) DataCenter: [Timer] State:0, Remain:0 s
+I (119035) DataCenter: ==========================
+I (119145) Dev_CSI: [雷达-V3] 得分: 1847 | 阈值: 250
+I (119645) Dev_CSI: [雷达-V3] 得分: 3057 | 阈值: 250
+I (119965) Dev_STM32: [RX] {"ev":"hb","up":124719}|5C89|0000
+I (119985) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":665}|D430|0000
+I (120145) Dev_CSI: [雷达-V3] 得分: 1126 | 阈值: 250
+</活动>
+
+I (120645) Dev_CSI: [雷达-V3] 得分:  441 | 阈值: 250
+<静止>
+I (121145) Dev_CSI: [雷达-V3] 得分:  234 | 阈值: 250
+I (121645) Dev_CSI: [雷达-V3] 得分:  251 | 阈值: 250
+I (121965) Dev_STM32: [RX] {"ev":"hb","up":124720}|BF41|0000
+I (121985) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":665}|D430|0000
+I (122145) Dev_CSI: [雷达-V3] 得分:  250 | 阈值: 250
+I (122645) Dev_CSI: [雷达-V3] 得分:  198 | 阈值: 250
+I (123145) Dev_CSI: [雷达-V3] 得分:  228 | 阈值: 250
+I (123645) Dev_CSI: [雷达-V3] 得分:  203 | 阈值: 250
+I (123965) Dev_STM32: [RX] {"ev":"hb","up":124721}|8C70|0000
+I (123985) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":666}|8163|0000
+I (124035) DataCenter: === Data Center Status ===
+I (124035) DataCenter: [Light] Power:1, Bri:0%, CCT:70%
+I (124035) DataCenter: [Env]   InTemp:23C, InHum:77%, InLux:666, OutWeather:未知, OutTemp:0C
+I (124035) DataCenter: [Timer] State:0, Remain:0 s
+I (124045) DataCenter: ==========================
+I (124145) Dev_CSI: [雷达-V3] 得分:  222 | 阈值: 250
+</静止>
