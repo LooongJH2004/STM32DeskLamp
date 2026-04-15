@@ -1,0 +1,156 @@
+I (4884805) Dev_CSI: [雷达-V3] 得分:   63 | 阈值: 250
+I (4885105) DataCenter: === Data Center Status ===
+I (4885105) DataCenter: [Light] Power:0, Bri:97%, CCT:70%
+I (4885105) DataCenter: [Env]   InTemp:23C, InHum:77%, InLux:653, OutWeather:未���, OutTemp:0C
+I (4885105) DataCenter: [Timer] State:0, Remain:0 s
+I (4885115) DataCenter: ==========================
+I (4885305) Dev_CSI: [雷达-V3] 得分:   82 | 阈值: 250
+I (4885315) Storage_NVS: ✅ Data successfully saved to Flash (Debounced & Safe).
+I (4885805) Dev_CSI: [雷达-V3] 得分:   61 | 阈值: 250
+I (4885915) Dev_STM32: [RX] {"ev":"hb","up":124313}|79B3|0000
+I (4885945) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":646}|EF03|0000
+I (4886305) Dev_CSI: [雷达-V3] 得分:   90 | 阈值: 250
+I (4886805) Dev_CSI: [雷达-V3] 得分:   64 | 阈值: 250
+I (4887245) MAIN: Physical Key Click!
+I (4887245) Svc_Core: [IDLE] Key Click -> Switch to LISTENING
+I (4887245) BaiduASR: Start Recording (VAD Enabled)... Max: 60000 ms
+I (4887305) Dev_CSI: [雷达-V3] 得分:   64 | 阈值: 250
+I (4887805) Dev_CSI: [雷达-V3] 得分:   67 | 阈值: 250
+I (4887915) Dev_STM32: [RX] {"ev":"hb","up":124314}|E024|0000
+I (4887945) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":644}|8961|0000
+I (4888305) Dev_CSI: [雷达-V3] 得分:   68 | 阈值: 250
+I (4888805) Dev_CSI: [雷达-V3] 得分:   55 | 阈值: 250
+I (4889305) Dev_CSI: [雷达-V3] 得分:   78 | 阈值: 250
+I (4889805) Dev_CSI: [雷达-V3] 得分:   71 | 阈值: 250
+I (4889915) Dev_STM32: [RX] {"ev":"hb","up":124315}|D315|0000
+I (4889945) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":644}|8961|0000
+I (4890115) DataCenter: === Data Center Status ===
+I (4890115) DataCenter: [Light] Power:0, Bri:97%, CCT:70%
+I (4890115) DataCenter: [Env]   InTemp:23C, InHum:77%, InLux:644, OutWeather:未���, OutTemp:0C
+I (4890115) DataCenter: [Timer] State:0, Remain:0 s
+I (4890125) DataCenter: ==========================
+I (4890305) Dev_CSI: [雷达-V3] 得分:   70 | 阈值: 250
+I (4890805) Dev_CSI: [雷达-V3] 得分:   85 | 阈值: 250
+I (4891305) Dev_CSI: [雷达-V3] 得分:   82 | 阈值: 250
+I (4891805) Dev_CSI: [雷达-V3] 得分:   67 | 阈值: 250
+I (4891915) Dev_STM32: [RX] {"ev":"hb","up":124316}|8646|0000
+I (4891945) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":654}|BE51|0000
+I (4892305) Dev_CSI: [雷达-V3] 得分:   59 | 阈值: 250
+I (4892805) Dev_CSI: [雷达-V3] 得分:   60 | 阈值: 250
+I (4893305) Dev_CSI: [雷达-V3] 得分:   84 | 阈值: 250
+I (4893805) Dev_CSI: [雷达-V3] 得分:   82 | 阈值: 250
+I (4893915) Dev_STM32: [RX] {"ev":"hb","up":124317}|B577|0000
+I (4893945) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":654}|BE51|0000
+I (4894305) Dev_CSI: [雷达-V3] 得分:   84 | 阈值: 250
+I (4894805) Dev_CSI: [雷达-V3] 得分:  108 | 阈值: 250
+I (4895125) DataCenter: === Data Center Status ===
+I (4895125) DataCenter: [Light] Power:0, Bri:97%, CCT:70%
+I (4895125) DataCenter: [Env]   InTemp:23C, InHum:77%, InLux:654, OutWeather:未���, OutTemp:0C
+I (4895125) DataCenter: [Timer] State:0, Remain:0 s
+I (4895135) DataCenter: ==========================
+I (4895305) Dev_CSI: [雷达-V3] 得分:   71 | 阈值: 250
+I (4895805) Dev_CSI: [雷达-V3] 得分:   66 | 阈值: 250
+I (4895925) Dev_STM32: [RX] {"ev":"hb","up":124318}|A549|0000
+I (4895945) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":653}|27C6|0000
+I (4896305) Dev_CSI: [雷达-V3] 得分:   97 | 阈值: 250
+I (4896805) Dev_CSI: [雷达-V3] 得分:   83 | 阈值: 250
+I (4897305) Dev_CSI: [雷达-V3] 得分:   87 | 阈值: 250
+I (4897805) Dev_CSI: [雷达-V3] 得分:   87 | 阈值: 250
+I (4897925) Dev_STM32: [RX] {"ev":"hb","up":124319}|9678|0000
+I (4897945) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":653}|27C6|0000
+I (4898305) Dev_CSI: [雷达-V3] 得分:   67 | 阈值: 250
+I (4898805) Dev_CSI: [雷达-V3] 得分:   73 | 阈值: 250
+I (4899305) Dev_CSI: [雷达-V3] 得分:   90 | 阈值: 250
+I (4899805) Dev_CSI: [雷达-V3] 得分:   84 | 阈值: 250
+I (4899925) Dev_STM32: [RX] {"ev":"hb","up":124320}|75B0|0000
+I (4899945) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":654}|BE51|0000
+I (4900135) DataCenter: === Data Center Status ===
+I (4900135) DataCenter: [Light] Power:0, Bri:97%, CCT:70%
+I (4900135) DataCenter: [Env]   InTemp:23C, InHum:77%, InLux:654, OutWeather:未���, OutTemp:0C
+I (4900135) DataCenter: [Timer] State:0, Remain:0 s
+I (4900145) DataCenter: ==========================
+I (4900305) Dev_CSI: [雷达-V3] 得分:   75 | 阈值: 250
+I (4900805) Dev_CSI: [雷达-V3] 得分:   67 | 阈值: 250
+I (4901305) Dev_CSI: [雷达-V3] 得分:   62 | 阈值: 250
+I (4901805) Dev_CSI: [雷达-V3] 得分:   81 | 阈值: 250
+I (4901925) Dev_STM32: [RX] {"ev":"hb","up":124321}|4681|0000
+I (4901945) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":654}|BE51|0000
+I (4902305) Dev_CSI: [雷达-V3] 得分:   90 | 阈值: 250
+I (4902795) BaiduASR: Silence detected (2528 ms). Stopping.
+I (4902795) BaiduASR: [TIMING] T0: VAD Silence Detected, Start ASR Upload
+I (4902795) BaiduASR: Recording finished. Total: 499712 bytes (15616 ms). Uploading...
+I (4902805) Dev_CSI: [雷达-V3] 得分:   73 | 阈值: 250
+I (4903305) Dev_CSI: [雷达-V3] 得分:   76 | 阈值: 250
+I (4903805) Dev_CSI: [雷达-V3] 得分:   83 | 阈值: 250
+I (4903925) Dev_STM32: [RX] {"ev":"hb","up":124322}|13D2|0000
+I (4903945) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":654}|BE51|0000
+I (4904305) Dev_CSI: [雷达-V3] 得分:   77 | 阈值: 250
+I (4904805) Dev_CSI: [雷达-V3] 得分:   72 | 阈值: 250
+I (4905145) DataCenter: === Data Center Status ===
+I (4905145) DataCenter: [Light] Power:0, Bri:97%, CCT:70%
+I (4905145) DataCenter: [Env]   InTemp:23C, InHum:77%, InLux:654, OutWeather:未���, OutTemp:0C
+I (4905145) DataCenter: [Timer] State:0, Remain:0 s
+I (4905155) DataCenter: ==========================
+I (4905305) Dev_CSI: [雷达-V3] 得分:   93 | 阈值: 250
+I (4905725) BaiduASR: ASR HTTP Status: 200
+I (4905725) BaiduASR: [TIMING] T1: ASR Result Received
+I (4905725) BaiduASR: ASR Response: {"corpus_no":"7628864574868513220","err_msg":"success.","err_no":0,"result":["请帮我把灯关掉，谢谢，嗯。"],"sn":"169476078451776233449"}
+
+I (4905745) Svc_Core: [LISTENING] ASR Result: 请帮我把灯关掉，谢谢，嗯。
+I (4905745) LampMind: Sending to LampMind: 请帮我把灯关掉，谢��，嗯。
+I (4905805) Dev_CSI: [雷达-V3] 得分:   87 | 阈值: 250
+I (4905925) Dev_STM32: [RX] {"ev":"hb","up":124323}|20E3|0000
+I (4905945) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":655}|8D60|0000
+I (4906305) Dev_CSI: [雷达-V3] 得分:   84 | 阈值: 250
+I (4906805) Dev_CSI: [雷达-V3] 得分:   81 | 阈值: 250
+I (4907305) Dev_CSI: [雷达-V3] 得分:   82 | 阈值: 250
+I (4907805) Dev_CSI: [雷达-V3] 得分:   78 | 阈值: 250
+I (4907925) Dev_STM32: [RX] {"ev":"hb","up":124324}|B974|0000
+I (4907945) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":712}|BE83|0000
+I (4908305) Dev_CSI: [雷达-V3] 得分:   59 | 阈值: 250
+I (4908805) Dev_CSI: [雷达-V3] 得分:   61 | 阈值: 250
+I (4909305) Dev_CSI: [雷达-V3] 得分:   75 | 阈值: 250
+I (4909805) Dev_CSI: [雷达-V3] 得分:   82 | 阈值: 250
+I (4909925) Dev_STM32: [RX] {"ev":"hb","up":124325}|8A45|0000
+I (4909945) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":649}|FF3D|0000
+I (4910155) DataCenter: === Data Center Status ===
+I (4910155) DataCenter: [Light] Power:0, Bri:97%, CCT:70%
+I (4910155) DataCenter: [Env]   InTemp:23C, InHum:77%, InLux:649, OutWeather:未���, OutTemp:0C
+I (4910155) DataCenter: [Timer] State:0, Remain:0 s
+I (4910165) DataCenter: ==========================
+I (4910305) Dev_CSI: [雷达-V3] 得分:   81 | 阈值: 250
+I (4910805) Dev_CSI: [雷达-V3] 得分:   74 | 阈值: 250
+I (4911305) Dev_CSI: [雷达-V3] 得分:   57 | 阈值: 250
+I (4911805) Dev_CSI: [雷达-V3] 得分:   99 | 阈值: 250
+I (4911925) Dev_STM32: [RX] {"ev":"hb","up":124326}|DF16|0000
+I (4911955) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":655}|8D60|0000
+I (4912305) Dev_CSI: [雷达-V3] 得分:   81 | 阈值: 250
+I (4912805) Dev_CSI: [雷达-V3] 得分:   67 | 阈值: 250
+I (4913155) LampMind: HTTP Status: 200
+I (4913155) LampMind: [TIMING] T2: LLM Reply Received
+I (4913155) LampMind: Response: {"reply_text":"好的，我已经把灯关掉了。现在房间��该暗下来了，你可以好好休息了。","action":{"cmd":"light","val":null,"brightness":0,"color_temp":70}}
+I (4913175) LampMind: Action executed: Light updated
+I (4913175) Svc_Core: [PROCESSING] LLM Result -> Switch to SPEAKING
+I (4913185) Svc_Core: >>> LampMind Reply: 好的，我已经把灯关掉了。��在房间应该暗下来了，你可以好好休息了。
+I (4913195) BaiduTTS: Requesting TTS for text: 好的，我已经把灯关掉了。现在房间应该暗下来了，你可以好好���息了。
+I (4913305) Dev_CSI: [雷达-V3] 得分:   85 | 阈值: 250
+I (4913695) BaiduTTS: [TIMING] T3: TTS First Audio Chunk Received
+I (4913775) Svc_Audio: [TIMING] T4: Audio Buffering Done, Start Speaker Output
+I (4913775) Svc_Audio: Buffering done, start playing.
+I (4913805) Dev_CSI: [雷达-V3] 得分:   63 | 阈值: 250
+I (4913925) Dev_STM32: [RX] {"ev":"hb","up":124327}|EC27|0000
+I (4913945) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":655}|8D60|0000
+I (4914305) Dev_CSI: [雷达-V3] 得分:   79 | 阈值: 250
+I (4914805) Dev_CSI: [雷达-V3] 得分:   70 | 阈值: 250
+I (4915165) DataCenter: === Data Center Status ===
+I (4915165) DataCenter: [Light] Power:0, Bri:0%, CCT:70%
+I (4915165) DataCenter: [Env]   InTemp:23C, InHum:77%, InLux:655, OutWeather:未��, OutTemp:0C
+I (4915165) DataCenter: [Timer] State:0, Remain:0 s
+I (4915175) DataCenter: ==========================
+I (4915305) Dev_CSI: [雷达-V3] 得分:   76 | 阈值: 250
+I (4915805) Dev_CSI: [雷达-V3] 得分:   77 | 阈值: 250
+I (4915925) Dev_STM32: [RX] {"ev":"hb","up":124328}|FC19|0000
+I (4915955) Dev_STM32: [RX] {"ev":"env","t":23,"h":77,"l":654}|BE51|0000
+I (4916185) Storage_NVS: ✅ Data successfully saved to Flash (Debounced & Safe).
+I (4916305) Dev_CSI: [雷达-V3] 得分:   80 | 阈值: 250
+I (4916805) Dev_CSI: [雷达-V3] 得分:   70 | 阈值: 250
