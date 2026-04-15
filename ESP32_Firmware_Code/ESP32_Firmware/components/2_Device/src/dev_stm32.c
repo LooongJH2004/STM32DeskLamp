@@ -27,31 +27,49 @@ typedef void (*crc_send_strategy_t)(const char *json_str);
 // 策略1：正确的 CRC 计算
 static void _send_crc_right(const char *json_str) {
     if (!s_tx_mutex) return;
-    uint16_t crc = CRC16_Calculate((const uint8_t *)json_str, strlen(json_str));
+    
+    // 1. 计算正确的 CRC
+    uint16_t calc_crc = CRC16_Calculate((const uint8_t *)json_str, strlen(json_str));
+    uint16_t send_crc = calc_crc; // 正常发送正确的 CRC
+    
+    // 2. 本地自检 (模拟接收端校验，余数必然为 0)
+    uint16_t remainder = calc_crc ^ send_crc; 
+    
+    // 3. 组装物理帧并发送
     char buf[256];
-    snprintf(buf, sizeof(buf), "%s|%04X\r\n", json_str, crc);
+    snprintf(buf, sizeof(buf), "%s|%04X\r\n", json_str, send_crc);
     
     xSemaphoreTake(s_tx_mutex, portMAX_DELAY);
     uart_write_bytes(UART_NUM, buf, strlen(buf));
     xSemaphoreGive(s_tx_mutex);
     
-    ESP_LOGI(TAG, "[TX_RIGHT] %s", buf); 
+    // 4. 打印格式：json|发送的CRC|本地校验余数
+    ESP_LOGI(TAG, "[TX_RIGHT] %s|%04X|%04X", json_str, send_crc, remainder); 
 }
 
 // 策略2：错误的 CRC 计算 (主动反转，用于测试 STM32 的拦截率)
 static void _send_crc_error(const char *json_str) {
     if (!s_tx_mutex) return;
-    uint16_t crc = CRC16_Calculate((const uint8_t *)json_str, strlen(json_str));
-    crc = ~crc; // 【关键】按位取反，人为制造 CRC 错误
     
+    // 1. 计算正确的 CRC
+    uint16_t calc_crc = CRC16_Calculate((const uint8_t *)json_str, strlen(json_str));
+    
+    // 2. 制造错误：按位取反
+    uint16_t send_crc = ~calc_crc; 
+    
+    // 3. 本地自检 (模拟接收端校验，余数必然不为 0)
+    uint16_t remainder = calc_crc ^ send_crc; 
+    
+    // 4. 组装物理帧并发送
     char buf[256];
-    snprintf(buf, sizeof(buf), "%s|%04X\r\n", json_str, crc);
+    snprintf(buf, sizeof(buf), "%s|%04X\r\n", json_str, send_crc);
     
     xSemaphoreTake(s_tx_mutex, portMAX_DELAY);
     uart_write_bytes(UART_NUM, buf, strlen(buf));
     xSemaphoreGive(s_tx_mutex);
     
-    ESP_LOGW(TAG, "[TX_ERROR] %s", buf); 
+    // 5. 打印格式：json|发送的错误CRC|本地校验余数 (非0)
+    ESP_LOGW(TAG, "[TX_ERROR] %s|%04X|%04X", json_str, send_crc, remainder); 
 }
 
 // 当前使用的发送策略 (默认正确)
