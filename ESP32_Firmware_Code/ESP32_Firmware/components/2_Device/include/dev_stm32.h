@@ -18,3 +18,9 @@ void Dev_STM32_Set_Light(uint16_t warm, uint16_t cold);
  * @param mode 0: Local 模式, 1: Remote UI 模式
  */
 void Dev_STM32_Set_Mode(uint8_t mode);
+
+/**
+ * @brief 动态切换 CRC 发送策略 (用于误码率与拦截测试)
+ * @param mode 0: 正确 CRC (crc_right); 1: 错误 CRC (crc_error)
+ */
+void Dev_STM32_Set_CRC_Mode(uint8_t mode);

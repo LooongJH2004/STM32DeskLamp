@@ -133,13 +133,11 @@ void Key_Task(void *pvParameters) {
 // [新增] PC 串口指令监听任务 (用于动态切换 CSI 算法)
 // ============================================================================
 static void pc_uart_cmd_task(void *arg) {
-    ESP_LOGI(TAG, "PC UART Command Listener Started. Type 'csi1', 'csi2', or 'csi3' to switch modes.");
+    ESP_LOGI(TAG, "PC UART Command Listener Started.");
     char line[128];
     
     while (1) {
-        // 阻塞读取标准输入 (PC 串口助手发来的数据)
         if (fgets(line, sizeof(line), stdin) != NULL) {
-            // 去除换行符
             line[strcspn(line, "\r\n")] = 0;
             
             if (strcmp(line, "csi1") == 0) {
@@ -148,7 +146,14 @@ static void pc_uart_cmd_task(void *arg) {
                 Dev_CSI_Set_Mode(2);
             } else if (strcmp(line, "csi3") == 0) {
                 Dev_CSI_Set_Mode(3);
-            } else if (strlen(line) > 0) {
+            } 
+            // [新增] CRC 动态切换指令
+            else if (strcmp(line, "crc0") == 0) {
+                Dev_STM32_Set_CRC_Mode(0); // 恢复正常
+            } else if (strcmp(line, "crc1") == 0) {
+                Dev_STM32_Set_CRC_Mode(1); // 开启错误注入
+            } 
+            else if (strlen(line) > 0) {
                 ESP_LOGW(TAG, "Unknown command: %s", line);
             }
         }

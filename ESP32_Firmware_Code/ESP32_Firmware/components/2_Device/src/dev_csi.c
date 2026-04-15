@@ -30,6 +30,10 @@ static csi_presence_cb_t s_app_cb = NULL;
 static volatile uint32_t s_last_active_tick = 0;
 static bool s_is_present = false;
 
+// [新增] Ping 会话句柄与看门狗时间戳
+static esp_ping_handle_t s_ping_handle = NULL;
+static volatile uint32_t s_last_csi_rx_tick = 0;
+
 // ============================================================
 // 算法 1：归一化轮廓绝对差值法 (V1)
 // ============================================================
@@ -174,7 +178,44 @@ static uint32_t algo3_eval(void) {
 // 核心调度与任务
 // ============================================================
 static void wifi_csi_rx_cb(void *ctx, wifi_csi_info_t *info) {
+    s_last_csi_rx_tick = xTaskGetTickCount(); // [关键] 喂狗：只要收到 CSI 数据就更新时间戳
     if (s_current_rx_algo) s_current_rx_algo(info);
+}
+
+// [新增] 停止 Ping 发射器
+static void stop_ping_emitter(void) {
+    if (s_ping_handle) {
+        esp_ping_stop(s_ping_handle);
+        esp_ping_delete_session(s_ping_handle);
+        s_ping_handle = NULL;
+        ESP_LOGI(TAG, "Ping emitter stopped.");
+    }
+}
+
+// [修改] 启动 Ping 发射器 (支持重复调用)
+static void start_ping_emitter(void) {
+    stop_ping_emitter(); // 确保旧的会话被彻底清理
+
+    esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
+    if (!netif) return;
+    esp_netif_ip_info_t ip_info;
+    
+    // 如果获取不到 IP (比如 Wi-Fi 断开了)，直接返回，等待看门狗下次重试
+    if (esp_netif_get_ip_info(netif, &ip_info) != ESP_OK || ip_info.gw.addr == 0) {
+        return; 
+    }
+
+    esp_ping_config_t ping_config = ESP_PING_DEFAULT_CONFIG();
+    ping_config.target_addr.type = ESP_IPADDR_TYPE_V4;
+    ping_config.target_addr.u_addr.ip4.addr = ip_info.gw.addr; 
+    ping_config.count = ESP_PING_COUNT_INFINITE;               
+    ping_config.interval_ms = 50;                              
+    ping_config.data_size = 32;                                
+
+    if (esp_ping_new_session(&ping_config, NULL, &s_ping_handle) == ESP_OK) {
+        esp_ping_start(s_ping_handle);
+        ESP_LOGI(TAG, "Ping emitter started targeting GW: " IPSTR, IP2STR(&ip_info.gw));
+    }
 }
 
 void Dev_CSI_Set_Mode(uint8_t mode) {
@@ -207,10 +248,22 @@ void Dev_CSI_Set_Mode(uint8_t mode) {
 
 static void csi_monitor_task(void *arg) {
     int consecutive_motion_count = 0;
+    s_last_csi_rx_tick = xTaskGetTickCount(); // 初始化看门狗
+
     while (1) {
         uint32_t now = xTaskGetTickCount();
-        uint32_t score = 0;
         
+        // ============================================================
+        // [关键新增] CSI 数据流看门狗 (Self-Healing)
+        // 如果超过 5 秒没有收到任何 CSI 数据，说明 Ping 挂了或者 Wi-Fi 断了
+        // ============================================================
+        if ((now - s_last_csi_rx_tick) * portTICK_PERIOD_MS > 5000) {
+            ESP_LOGW(TAG, "CSI RX Timeout (5s)! Restarting Ping Emitter...");
+            start_ping_emitter();
+            s_last_csi_rx_tick = now; // 重置 tick，避免疯狂重启
+        }
+
+        uint32_t score = 0;
         if (s_current_eval_algo) score = s_current_eval_algo();
 
         ESP_LOGI(TAG, "[雷达-V%d] 得分: %4lu | 阈值: %lu", s_current_mode, score, s_current_threshold);
@@ -236,25 +289,6 @@ static void csi_monitor_task(void *arg) {
             }
         }
         vTaskDelay(pdMS_TO_TICKS(500)); 
-    }
-}
-
-static void start_ping_emitter(void) {
-    esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
-    if (!netif) return;
-    esp_netif_ip_info_t ip_info;
-    if (esp_netif_get_ip_info(netif, &ip_info) != ESP_OK || ip_info.gw.addr == 0) return;
-
-    esp_ping_config_t ping_config = ESP_PING_DEFAULT_CONFIG();
-    ping_config.target_addr.type = ESP_IPADDR_TYPE_V4;
-    ping_config.target_addr.u_addr.ip4.addr = ip_info.gw.addr; 
-    ping_config.count = ESP_PING_COUNT_INFINITE;               
-    ping_config.interval_ms = 50;                              
-    ping_config.data_size = 32;                                
-
-    esp_ping_handle_t ping;
-    if (esp_ping_new_session(&ping_config, NULL, &ping) == ESP_OK) {
-        esp_ping_start(ping);
     }
 }
 
