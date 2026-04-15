@@ -1,0 +1,123 @@
+I (2563455) Dev_STM32: [RX] {"ev":"hb","up":123152}|1CFE|0000
+I (2563475) Dev_STM32: [RX] {"ev":"env","t":23,"h":76,"l":585}|3BA8|0000
+I (2565115) Svc_Light: Apply Light -> Power:1, Bri:18, CCT:70 => Warm:54, Cold:126
+W (2565115) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":54,"cold":126}|E722|FFFF
+I (2565215) Svc_Light: Apply Light -> Power:1, Bri:29, CCT:70 => Warm:87, Cold:203
+W (2565215) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":87,"cold":203}|4F61|FFFF
+I (2565315) Svc_Light: Apply Light -> Power:1, Bri:57, CCT:70 => Warm:171, Cold:399
+W (2565315) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":171,"cold":399}|115A|FFFF
+I (2565415) Svc_Light: Apply Light -> Power:1, Bri:91, CCT:70 => Warm:273, Cold:637
+W (2565415) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":273,"cold":637}|2032|FFFF
+I (2565455) Dev_STM32: [RX] {"ev":"hb","up":123153}|2FCF|0000
+I (2565475) Dev_STM32: [RX] {"ev":"env","t":23,"h":76,"l":582}|A23F|0000
+I (2565515) Svc_Light: Apply Light -> Power:1, Bri:93, CCT:70 => Warm:279, Cold:651
+W (2565515) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":279,"cold":651}|B9A8|FFFF
+I (2565625) Svc_Light: Apply Light -> Power:1, Bri:55, CCT:70 => Warm:165, Cold:385
+W (2565625) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":165,"cold":385}|1DCB|FFFF
+I (2565725) Svc_Light: Apply Light -> Power:1, Bri:14, CCT:70 => Warm:42, Cold:98
+W (2565725) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":42,"cold":98}|09A0|FFFF
+I (2565875) Svc_Light: Apply Light -> Power:1, Bri:11, CCT:70 => Warm:33, Cold:77
+W (2565875) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":33,"cold":77}|CBE2|FFFF
+I (2565975) Svc_Light: Apply Light -> Power:1, Bri:47, CCT:70 => Warm:141, Cold:329
+W (2565975) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":141,"cold":329}|6C08|FFFF
+I (2566075) Svc_Light: Apply Light -> Power:1, Bri:81, CCT:70 => Warm:243, Cold:567
+W (2566075) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":243,"cold":567}|DDBD|FFFF
+I (2566175) Svc_Light: Apply Light -> Power:1, Bri:76, CCT:70 => Warm:228, Cold:532
+W (2566175) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":228,"cold":532}|0620|FFFF
+I (2566275) Svc_Light: Apply Light -> Power:1, Bri:37, CCT:70 => Warm:111, Cold:259
+W (2566275) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":111,"cold":259}|19E8|FFFF
+I (2566385) Svc_Light: Apply Light -> Power:1, Bri:4, CCT:70 => Warm:12, Cold:28
+W (2566385) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":12,"cold":28}|B99F|FFFF
+I (2566485) Svc_Light: Apply Light -> Power:1, Bri:15, CCT:70 => Warm:45, Cold:105
+W (2566485) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":45,"cold":105}|E213|FFFF
+I (2566585) Svc_Light: Apply Light -> Power:1, Bri:59, CCT:70 => Warm:177, Cold:413
+W (2566585) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":177,"cold":413}|8976|FFFF
+I (2566685) Svc_Light: Apply Light -> Power:1, Bri:88, CCT:70 => Warm:264, Cold:616
+W (2566685) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":264,"cold":616}|CC0A|FFFF
+I (2566785) Svc_Light: Apply Light -> Power:1, Bri:69, CCT:70 => Warm:207, Cold:483
+W (2566785) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":207,"cold":483}|84C4|FFFF
+I (2566885) Svc_Light: Apply Light -> Power:1, Bri:24, CCT:70 => Warm:72, Cold:168
+W (2566885) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":72,"cold":168}|6144|FFFF
+I (2566985) Svc_Light: Apply Light -> Power:1, Bri:4, CCT:70 => Warm:12, Cold:28
+W (2566985) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":12,"cold":28}|B99F|FFFF
+I (2567085) Svc_Light: Apply Light -> Power:1, Bri:36, CCT:70 => Warm:108, Cold:252
+W (2567085) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":108,"cold":252}|F04A|FFFF
+I (2567185) Svc_Light: Apply Light -> Power:1, Bri:85, CCT:70 => Warm:255, Cold:595
+W (2567185) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":255,"cold":595}|63E4|FFFF
+I (2567295) Svc_Light: Apply Light -> Power:1, Bri:84, CCT:70 => Warm:252, Cold:588
+W (2567295) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":252,"cold":588}|E880|FFFF
+I (2567395) Svc_Light: Apply Light -> Power:1, Bri:34, CCT:70 => Warm:102, Cold:238
+W (2567395) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":102,"cold":238}|2CBD|FFFF
+I (2567455) Dev_STM32: [RX] {"ev":"hb","up":123154}|B658|0000
+I (2567475) Dev_STM32: [RX] {"ev":"env","t":23,"h":76,"l":587}|5DCA|0000
+I (2567495) Svc_Light: Apply Light -> Power:1, Bri:0, CCT:70 => Warm:0, Cold:0
+W (2567495) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":0,"cold":0}|119B|FFFF
+I (2567595) Svc_Light: Apply Light -> Power:1, Bri:21, CCT:70 => Warm:63, Cold:147
+W (2567595) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":63,"cold":147}|2118|FFFF
+I (2567695) Svc_Light: Apply Light -> Power:1, Bri:67, CCT:70 => Warm:201, Cold:469
+W (2567695) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":201,"cold":469}|FF65|FFFF
+I (2567795) Svc_Light: Apply Light -> Power:1, Bri:71, CCT:70 => Warm:213, Cold:497
+W (2567795) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":213,"cold":497}|01FC|FFFF
+I (2567895) Svc_Light: Apply Light -> Power:1, Bri:28, CCT:70 => Warm:84, Cold:196
+W (2567895) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":84,"cold":196}|7A7C|FFFF
+I (2567995) Svc_Light: Apply Light -> Power:1, Bri:0, CCT:70 => Warm:0, Cold:0
+W (2567995) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":0,"cold":0}|119B|FFFF
+I (2568095) Svc_Light: Apply Light -> Power:1, Bri:23, CCT:70 => Warm:69, Cold:161
+W (2568095) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":69,"cold":161}|6442|FFFF
+I (2568195) Svc_Light: Apply Light -> Power:1, Bri:73, CCT:70 => Warm:219, Cold:511
+W (2568195) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":219,"cold":511}|F5D3|FFFF
+I (2568295) Svc_Light: Apply Light -> Power:1, Bri:83, CCT:70 => Warm:249, Cold:581
+W (2568295) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":249,"cold":581}|ED86|FFFF
+I (2568395) Svc_Light: Apply Light -> Power:1, Bri:39, CCT:70 => Warm:117, Cold:273
+W (2568395) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":117,"cold":273}|1728|FFFF
+I (2568495) Svc_Light: Apply Light -> Power:1, Bri:0, CCT:70 => Warm:0, Cold:0
+W (2568495) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":0,"cold":0}|119B|FFFF
+I (2568595) Svc_Light: Apply Light -> Power:1, Bri:18, CCT:70 => Warm:54, Cold:126
+W (2568595) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":54,"cold":126}|E722|FFFF
+I (2568695) Svc_Light: Apply Light -> Power:1, Bri:65, CCT:70 => Warm:195, Cold:455
+W (2568695) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":195,"cold":455}|95DA|FFFF
+I (2568795) Svc_Light: Apply Light -> Power:1, Bri:74, CCT:70 => Warm:222, Cold:518
+W (2568795) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":222,"cold":518}|0617|FFFF
+I (2568905) Svc_Light: Apply Light -> Power:1, Bri:25, CCT:70 => Warm:75, Cold:175
+W (2568905) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":75,"cold":175}|EA20|FFFF
+I (2569005) Svc_Light: Apply Light -> Power:1, Bri:0, CCT:70 => Warm:0, Cold:0
+W (2569005) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":0,"cold":0}|119B|FFFF
+I (2569105) Svc_Light: Apply Light -> Power:1, Bri:34, CCT:70 => Warm:102, Cold:238
+W (2569105) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":102,"cold":238}|2CBD|FFFF
+I (2569205) Svc_Light: Apply Light -> Power:1, Bri:79, CCT:70 => Warm:237, Cold:553
+W (2569205) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":237,"cold":553}|3D82|FFFF
+I (2569305) Svc_Light: Apply Light -> Power:1, Bri:75, CCT:70 => Warm:225, Cold:525
+W (2569305) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":225,"cold":525}|E313|FFFF
+I (2569405) Svc_Light: Apply Light -> Power:1, Bri:32, CCT:70 => Warm:96, Cold:224
+W (2569405) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":96,"cold":224}|8694|FFFF
+I (2569455) Dev_STM32: [RX] {"ev":"hb","up":123155}|8569|0000
+I (2569475) Dev_STM32: [RX] {"ev":"env","t":23,"h":76,"l":580}|C45D|0000
+I (2569505) Svc_Light: Apply Light -> Power:1, Bri:2, CCT:70 => Warm:6, Cold:14
+W (2569505) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":6,"cold":14}|A37F|FFFF
+I (2569605) Svc_Light: Apply Light -> Power:1, Bri:35, CCT:70 => Warm:105, Cold:245
+W (2569605) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":105,"cold":245}|1579|FFFF
+I (2569705) Svc_Light: Apply Light -> Power:1, Bri:86, CCT:70 => Warm:258, Cold:602
+W (2569705) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":258,"cold":602}|B4AA|FFFF
+I (2569815) Svc_Light: Apply Light -> Power:1, Bri:82, CCT:70 => Warm:246, Cold:574
+W (2569815) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":246,"cold":574}|FF10|FFFF
+I (2569915) Svc_Light: Apply Light -> Power:1, Bri:36, CCT:70 => Warm:108, Cold:252
+W (2569915) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":108,"cold":252}|F04A|FFFF
+I (2570015) Svc_Light: Apply Light -> Power:1, Bri:3, CCT:70 => Warm:9, Cold:21
+W (2570015) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":9,"cold":21}|1639|FFFF
+I (2570115) Svc_Light: Apply Light -> Power:1, Bri:28, CCT:70 => Warm:84, Cold:196
+W (2570115) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":84,"cold":196}|7A7C|FFFF
+I (2570215) Svc_Light: Apply Light -> Power:1, Bri:78, CCT:70 => Warm:234, Cold:546
+W (2570215) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":234,"cold":546}|3AE2|FFFF
+I (2570315) Svc_Light: Apply Light -> Power:1, Bri:82, CCT:70 => Warm:246, Cold:574
+W (2570315) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":246,"cold":574}|FF10|FFFF
+I (2570415) Svc_Light: Apply Light -> Power:1, Bri:40, CCT:70 => Warm:120, Cold:280
+W (2570415) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":120,"cold":280}|29E1|FFFF
+I (2570515) Svc_Light: Apply Light -> Power:1, Bri:8, CCT:70 => Warm:24, Cold:56
+W (2570515) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":24,"cold":56}|DB9B|FFFF
+I (2570625) Svc_Light: Apply Light -> Power:1, Bri:45, CCT:70 => Warm:135, Cold:315
+W (2570625) Dev_STM32: [TX_ERROR] {"cmd":"light","warm":135,"cold":315}|059E|FFFF
+I (2571455) Dev_STM32: [RX] {"ev":"hb","up":123156}|D03A|0000
+I (2571485) Dev_STM32: [RX] {"ev":"env","t":23,"h":76,"l":582}|A23F|0000
+I (2573455) Dev_STM32: [RX] {"ev":"hb","up":123157}|E30B|0000
+I (2573485) Dev_STM32: [RX] {"ev":"env","t":23,"h":76,"l":587}|5DCA|0000
+I (2573635) Storage_NVS: ✅ Data successfully saved to Flash (Debounced & Safe).
