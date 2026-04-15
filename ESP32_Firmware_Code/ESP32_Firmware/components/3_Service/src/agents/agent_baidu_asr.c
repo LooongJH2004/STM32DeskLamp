@@ -218,6 +218,9 @@ void Agent_ASR_Run_Session(void *pvParameters) {
     free(raw_i2s_buffer);
     s_is_recording = false;
 
+    // 【新增】T0: 录音结束，准备上传
+    ESP_LOGI(TAG, "[TIMING] T0: VAD Silence Detected, Start ASR Upload");
+
     // 5. 上传处理
     if (total_bytes_recorded < 16000 * 2 * 0.5) { 
         ESP_LOGW(TAG, "Recording too short (%d bytes), ignore.", total_bytes_recorded);
@@ -254,6 +257,9 @@ void Agent_ASR_Run_Session(void *pvParameters) {
             int status = esp_http_client_get_status_code(client);
             ESP_LOGI(TAG, "ASR HTTP Status: %d", status);
             if (status == 200 && s_asr_resp_buf) {
+                // 【新增】T1: ASR 识别完成
+                ESP_LOGI(TAG, "[TIMING] T1: ASR Result Received");
+                                
                 ESP_LOGI(TAG, "ASR Response: %s", s_asr_resp_buf);
                 cJSON *json = cJSON_Parse(s_asr_resp_buf);
                 if (json) {

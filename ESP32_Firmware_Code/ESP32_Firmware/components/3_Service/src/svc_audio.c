@@ -34,6 +34,7 @@ static void audio_play_task(void *arg) {
         if (is_buffering) {
             if (available >= 12288) { // 提高预缓冲阈值到 4KB
                 is_buffering = false;
+                ESP_LOGI(TAG, "[TIMING] T4: Audio Buffering Done, Start Speaker Output");
                 ESP_LOGI(TAG, "Buffering done, start playing.");
             } else {
                 // [修复] 缓冲期间，主动向 I2S 写入静音数据，防止 DMA 欠载发出杂音！

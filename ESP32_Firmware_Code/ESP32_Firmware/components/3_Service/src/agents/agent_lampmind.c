@@ -108,6 +108,8 @@ void Agent_LampMind_Chat_Task(void *pvParameters) {
         ESP_LOGI(TAG, "HTTP Status: %d", status);
         
         if (status == 200 && s_resp_buf) {
+            ESP_LOGI(TAG, "[TIMING] T2: LLM Reply Received");
+            
             ESP_LOGI(TAG, "Response: %s", s_resp_buf);
             cJSON *json = cJSON_Parse(s_resp_buf);
             if (json) {

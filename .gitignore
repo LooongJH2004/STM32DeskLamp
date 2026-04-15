@@ -122,3 +122,6 @@ test_baidu_tts.wav
 .idea/UseGit2VersionControl.iml
 .idea/vcs.xml
 ESP32_Firmware_Code/ESP32_Firmware/main/测试的指令.txt
+
+*.pdf
+*.png
